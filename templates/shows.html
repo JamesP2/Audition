@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block body %}
+    <h1>Available Shows</h1>
+    <p>Shows that can be auditioned for are displayed below. Please choose a show to view available audition slots.</p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Show Name</th>
+                <th>Show Audition Dates</th>
+                <th></th>
+            </tr>
+        </thead>
+        {% for show in shows %}
+            <tr>
+                <td>{{ show.name }}</td>
+                <td>{{ show.get_audition_dates_string() }}</td>
+                <td><a href="{{ url_for('audition_slots', show_id=show.id) }}">Show Audition Slots</a></td>
+            </tr>
+        {% endfor %}
+        {% if shows|length == 0 %}
+            <tr>
+                <td colspan="3" style="font-style: italic; text-align: center">Sorry, there are currently no shows open for audition.</td>
+            </tr>
+        {% endif %}
+    </table>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+{% block body %}
+    <h1>Auditions for {{ show.name }}</h1>
+    <p>Please pick a vacant audition slot</p>
+    <table class="table slot-table">
+        <thead>
+            <tr>
+                <th>Time</th>
+                <th>Availability</th>
+                <th></th>
+            </tr>
+        </thead>
+        {% for slot in show.get_audition_slots() %}
+            <tr>
+                <td>{{ slot.get_date_time_string() }}</td>
+                <td>{{ "Available" if slot.is_available else "Unavailable" }}</td>
+                <td>
+                    {% if slot.is_available %}
+                        <td><a href="{{ url_for("book_slot", slot_id=slot.id) }}" class="btn btn-primary">Book This Slot</a></td>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        {% if shows|length == 0 %}
+            <tr>
+                <td colspan="3" style="font-style: italic; text-align: center">Sorry, there are currently no shows open for audition.</td>
+            </tr>
+        {% endif %}
+        <!--<tr class="danger">
+            <td>20th October 9:00am - 9:20am</td>
+            <td>Unavailable</td>
+            <td></td>
+        </tr>
+        <tr class="danger">
+            <td>20th October 9:20am - 9:40am</td>
+            <td>Unavailable</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>20th October 9:40am - 10:00am</td>
+            <td>Available</td>
+            <td><a href="#" class="btn btn-primary">Book This Slot</a></td>
+        </tr>-->
+    </table>
+{% endblock %}
