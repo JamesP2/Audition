@@ -78,7 +78,9 @@ class AuditionDay(db.Model):
 
 class AuditionSlot(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    time = db.Column(db.Time)
+
+    start_time = db.Column(db.Time)
+    end_time = db.Column(db.Time)
 
     audition_day_show_id = db.Column(db.Integer)
     audition_day_date = db.Column(db.Date)
@@ -100,7 +102,7 @@ class AuditionSlot(db.Model):
         return self.audition_day.get_date_string() + self.get_time_string()
 
     def get_time_string(self):
-        return str(self.time)
+        return str(self.start_time)
 
     def is_available(self):
         return self.auditionee is not None

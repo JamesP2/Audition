@@ -2,8 +2,50 @@ from AuditionSlot import *
 from datetime import *
 
 
-def manage_day(day):
+def manage_slot(slot):
     pass
+
+
+def add_slots(day):
+    print('Bulk adding slots to ' + day.get_date_string())
+    start_time = input('Please enter a start time in the format HH:MM (24hr): ')
+    start_time = datetime.strptime(start_time, '%H:%M').time()
+
+    end_time = input('Enter the time that auditions should finish at (HH:MM): ')
+    end_time = datetime.strptime(end_time, '%H:%M').time()
+
+    duration = int(input('Enter the duration of each slot in minutes: '))
+    between = int(input('Enter number of minutes between each slot (default 0): ') or 0)
+
+    slots = []
+
+
+def manage_day(day):
+    print()
+    print('Viewing ' + day.get_date_string() + ' for show ' + day.show.name)
+
+    if len(day.audition_slots) == 0:
+        print('There are no audition slots on this day')
+
+    for i in range(0, len(day.audition_slots)):
+        print(str(i + 1) + ' - ' + str(day.audition_slots[i].start_time) + ' - ' + str(day.audition_slots[i].end_time))
+
+    print('Available Options:')
+    print('a - Bulk add new slots')
+    print('x - Return to previous menu')
+    option = input('Please select a day or an option')
+
+    if option == 'a':
+        add_slots(day)
+        return
+
+    elif option == 'x':
+        manage_days(day.show)
+        return
+
+    else:
+        slot_index = int(option) - 1
+        manage_slot(day.audition_slots[slot_index])
 
 
 def add_day(show):
@@ -11,13 +53,13 @@ def add_day(show):
     print('Adding a new date to ' + show.name)
     date_string = input('Please enter a date in the form DD/MM/YY')
 
-    date = datetime.strptime(date_string, '%d/%m/%y').date()
+    given_date = datetime.strptime(date_string, '%d/%m/%y').date()
 
-    print('The given date is ' + date.strftime("%A %d %B %Y"))
+    print('The given date is ' + given_date.strftime("%A %d %B %Y"))
     answer = input('Is this correct? [Y/n]').lower()
 
     if answer == '' or answer == 'y' or answer == 'yes':
-        day = AuditionDay(show=show, date=date)
+        day = AuditionDay(show=show, date=given_date)
         db.session.add(day)
         db.session.commit()
         print('Day added.')
