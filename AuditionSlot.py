@@ -60,12 +60,16 @@ class Show(db.Model):
 
         return slots
 
+    def has_day(self, date):
+        for day in self.audition_days:
+            if day.date == date:
+                return True
+
 
 class AuditionDay(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.Date)
+    date = db.Column(db.Date, primary_key=True)
 
-    show_id = db.Column(db.Integer, db.ForeignKey('show.id'), nullable=False)
+    show_id = db.Column(db.Integer, db.ForeignKey('show.id'), primary_key=True)
     show = db.relationship('Show', backref='audition_days')
 
     def get_date_string(self):
@@ -76,8 +80,19 @@ class AuditionSlot(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     time = db.Column(db.Time)
 
-    audition_day_id = db.Column(db.Integer, db.ForeignKey('audition_day.id'), nullable=False)
+    # audition_day_id = db.Column(db.Integer, db.ForeignKey('audition_day.id'), nullable=False)
     audition_day = db.relationship('AuditionDay', backref='audition_slots')
+
+    audition_day_show_id = db.Column(db.Integer)
+    audition_day_date = db.Column(db.Date)
+
+    __table_args__ = (
+        db.ForeignKeyConstraint(
+            ['audition_day_show_id', 'audition_day_date'],
+            ['audition_day.show_id', 'audition_day.date']
+        ),
+        {}
+    )
 
     auditionee_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     auditionee = db.relationship('User', backref='audition_slots')
