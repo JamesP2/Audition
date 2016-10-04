@@ -2,6 +2,70 @@ from AuditionSlot import *
 from datetime import *
 
 
+def add_minutes(base_time, minutes):
+    return (datetime.combine(date(year=1900, month=1, day=1), base_time)
+            + timedelta(minutes=minutes)).time()
+
+
+def manage_users():
+    print()
+    users = User.query.all()
+
+    if len(users) == 0:
+        print('No users in database')
+
+    for user in users:
+        print(str(user.id) + ': ' + user.username + ' - ' + user.get_full_name())
+
+    print('Available Options:')
+    print('a - Add user')
+    print('d - Delete user')
+    print('x - Return to main menu')
+
+    option = input('Choose an option: ')
+
+    if option == 'a':
+        username = input('Enter username: ')
+        first = input('Enter first name: ')
+        last = input('Enter last name: ')
+        password = input('Enter password: ')
+        password2 = input('Confirm password: ')
+
+        if password != password2:
+            print('Passwords did not match!')
+            manage_users()
+            return
+
+        user = User(username=username, first_name=first, last_name=last)
+        user.set_password(password)
+
+        db.session.add(user)
+        db.session.commit()
+        manage_users()
+        return
+
+    elif option == 'd':
+        id = input('Enter a user ID to delete: ')
+        user = User.query.get(id)
+
+        if user is not None:
+            db.session.delete(user)
+            db.session.commit()
+            print('User deleted')
+
+        else:
+            print('User does not exist')
+
+        manage_users()
+        return
+
+    elif option == 'x':
+        main()
+        return
+
+    manage_users()
+
+
 def manage_slot(slot):
     pass
 
@@ -17,7 +81,32 @@ def add_slots(day):
     duration = int(input('Enter the duration of each slot in minutes: '))
     between = int(input('Enter number of minutes between each slot (default 0): ') or 0)
 
+    last_time = start_time
+
     slots = []
+
+    while last_time < end_time:
+        slot_start = last_time
+        slot_end = add_minutes(slot_start, duration)
+
+        slot = AuditionSlot(start_time=slot_start, end_time=slot_end, audition_day=day)
+        db.session.add(slot)
+
+        slots.append(slot)
+
+        last_time = add_minutes(slot_end, between)
+
+    db.session.commit()
+
+    print('The following slots were generated:')
+
+    for slot in slots:
+        print(str(slot))
+
+    print()
+    print('================================================================================')
+
+    manage_day(day)
 
 
 def manage_day(day):
@@ -55,7 +144,7 @@ def add_day(show):
 
     given_date = datetime.strptime(date_string, '%d/%m/%y').date()
 
-    print('The given date is ' + given_date.strftime("%A %d %B %Y"))
+    print('The given date is ' + given_date.strftime('%A %d %B %Y'))
     answer = input('Is this correct? [Y/n]').lower()
 
     if answer == '' or answer == 'y' or answer == 'yes':
@@ -159,22 +248,31 @@ def main():
         for i in range(0, len(shows)):
             print(str(i+1) + ' - ' + shows[i].name)
 
-        show_index = input('Please select a show to manage, 0 to make a new one, x to exit')
+        print('Available options:')
+        print('a - Add new show')
+        print('u - Manage Users')
+        print('x - Exit')
 
-        if show_index == 'x':
+        option = input('Please select a show or enter an option')
+
+        if option == 'x':
             return
 
-        show_index = int(show_index)
-
-        if show_index == 0:
+        elif option == 'a':
             create_show()
             return
 
-        if show_index > len(shows):
+        elif option == 'u':
+            manage_users()
+            return
+
+        option = int(option)
+
+        if option > len(shows):
             print('Number specified outside of range. Exiting')
             return
 
-        manage_show(shows[show_index - 1])
+        manage_show(shows[option - 1])
 
 print('AuditionSlot Management Tool')
 main()

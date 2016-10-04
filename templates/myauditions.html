@@ -15,7 +15,7 @@
                 <tr>
                     <td>{{ slot.audition_day.show.name }}</td>
                     <td>{{ slot.get_date_time_string() }}</td>
-                    <td><a href="#" class="btn btn-danger">Cancel Slot</a></td>
+                    <td><a href="#" class="danger">Cancel Slot</a></td>
                 </tr>
             {% endfor %}
             {% if user.slots|length == 0 %}

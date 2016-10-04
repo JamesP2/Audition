@@ -35,6 +35,9 @@ class User(db.Model):
     def set_password(self, password):
         self.password = generate_password_hash(password)
 
+    def get_full_name(self):
+        return self.first_name + ' ' + self.last_name
+
 
 class Show(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -73,7 +76,10 @@ class AuditionDay(db.Model):
     show = db.relationship('Show', backref='audition_days')
 
     def get_date_string(self):
-        return self.date.strftime("%A %d %B %Y")
+        return self.date.strftime('%A %d %B %Y')
+
+    def get_short_date_string(self):
+        return self.date.strftime('%d/%m/%y')
 
 
 class AuditionSlot(db.Model):
@@ -87,6 +93,9 @@ class AuditionSlot(db.Model):
 
     audition_day = db.relationship('AuditionDay', backref='audition_slots')
 
+    auditionee_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    auditionee = db.relationship('User', backref='audition_slots')
+
     __table_args__ = (
         db.ForeignKeyConstraint(
             ['audition_day_show_id', 'audition_day_date'],
@@ -95,17 +104,34 @@ class AuditionSlot(db.Model):
         {}
     )
 
-    auditionee_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    auditionee = db.relationship('User', backref='audition_slots')
+    __mapper_args__ = {
+        'order_by': start_time
+    }
 
     def get_date_time_string(self):
-        return self.audition_day.get_date_string() + self.get_time_string()
+        return self.audition_day.get_short_date_string() \
+               + ' ' + self.get_start_time_string() + ' - ' + self.get_end_time_string()
 
-    def get_time_string(self):
-        return str(self.start_time)
+    def get_long_date_time_string(self):
+        return self.audition_day.get_date_string() \
+               + ' ' + self.get_start_time_string() + ' - ' + self.get_end_time_string()
+
+    def get_start_time_string(self):
+        return self.start_time.strftime('%H:%M')
+
+    def get_end_time_string(self):
+        return self.end_time.strftime('%H:%M')
 
     def is_available(self):
-        return self.auditionee is not None
+        return self.auditionee is None
+
+    def __repr__(self):
+        return 'AuditionSlot %s' % str(self.id)
+
+    def __str__(self):
+        return 'Audition Slot %s - %s (%s)' \
+               % (str(self.start_time), str(self.end_time),
+                  'Available' if self.is_available() else 'Unavailable')
 
 
 login_manager = LoginManager()
@@ -137,6 +163,7 @@ def my_auditions():
 
 
 @app.route('/showauditions/<int:show_id>')
+@login_required
 def audition_slots(show_id):
     show = Show.query.get(show_id)
 
@@ -148,9 +175,25 @@ def audition_slots(show_id):
                            show=show)
 
 
-@app.route('/book/<int:slot_id>')
+@app.route('/book/<int:slot_id>', methods=['GET', 'POST'])
+@login_required
 def book_slot(slot_id):
-    pass
+    slot = AuditionSlot.query.get(slot_id)
+    if slot is None:
+        flash('Slot not found', 'error')
+        return redirect(url_for('index'))
+
+    if request.method == 'GET':
+        return render_template('confirmslot.html',
+                               show=slot.audition_day.show,
+                               slot=slot)
+
+    slot.auditionee = current_user
+    db.session.add(slot)
+    db.session.commit()
+
+    flash('Your audition has been booked. We look forward to seeing you soon')
+    return redirect(url_for('my_auditions'))
 
 
 @app.route('/login', methods=['GET', 'POST'])

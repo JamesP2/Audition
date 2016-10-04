@@ -2,7 +2,7 @@
 {% block body %}
     <h1>Auditions for {{ show.name }}</h1>
     <p>Please pick a vacant audition slot</p>
-    <table class="table slot-table">
+    <table class="table">
         <thead>
             <tr>
                 <th>Time</th>
@@ -11,19 +11,19 @@
             </tr>
         </thead>
         {% for slot in show.get_audition_slots() %}
-            <tr>
+            <tr class="audition-slot{% if not slot.is_available() %} danger{% endif %}">
                 <td>{{ slot.get_date_time_string() }}</td>
-                <td>{{ "Available" if slot.is_available else "Unavailable" }}</td>
+                <td>{{ "Available" if slot.is_available() else "Unavailable" }}</td>
                 <td>
-                    {% if slot.is_available %}
-                        <td><a href="{{ url_for("book_slot", slot_id=slot.id) }}" class="btn btn-primary">Book This Slot</a></td>
+                    {% if slot.is_available() %}
+                        <a href="{{ url_for("book_slot", slot_id=slot.id) }}">Book This Slot</a>
                     {% endif %}
                 </td>
             </tr>
         {% endfor %}
-        {% if shows|length == 0 %}
+        {% if show.get_audition_slots()|length == 0 %}
             <tr>
-                <td colspan="3" style="font-style: italic; text-align: center">Sorry, there are currently no shows open for audition.</td>
+                <td colspan="3" style="font-style: italic; text-align: center">Sorry, there are currently no audition slots listed for this show.</td>
             </tr>
         {% endif %}
         <!--<tr class="danger">
