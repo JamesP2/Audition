@@ -1,7 +1,7 @@
 from distutils.core import setup
 
 setup(
-    name='AuditionSlot',
+    name='audition',
     version='',
     packages=[''],
     url='',

@@ -274,5 +274,5 @@ def main():
 
         manage_show(shows[option - 1])
 
-print('AuditionSlot Management Tool')
+print('audition Management Tool')
 main()
