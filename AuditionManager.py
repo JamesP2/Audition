@@ -66,42 +66,42 @@ def manage_users():
     manage_users()
 
 
-def manage_slot(slot):
+def manage_audition(slot):
     pass
 
 
-def add_slots(day):
-    print('Bulk adding slots to ' + day.get_date_string())
+def add_auditions(day):
+    print('Bulk adding auditions to ' + day.get_date_string())
     start_time = input('Please enter a start time in the format HH:MM (24hr): ')
     start_time = datetime.strptime(start_time, '%H:%M').time()
 
     end_time = input('Enter the time that auditions should finish at (HH:MM): ')
     end_time = datetime.strptime(end_time, '%H:%M').time()
 
-    duration = int(input('Enter the duration of each slot in minutes: '))
-    between = int(input('Enter number of minutes between each slot (default 0): ') or 0)
+    duration = int(input('Enter the duration of each audition in minutes: '))
+    between = int(input('Enter number of minutes between each audition (default 0): ') or 0)
 
     last_time = start_time
 
-    slots = []
+    auditions = []
 
     while last_time < end_time:
-        slot_start = last_time
-        slot_end = add_minutes(slot_start, duration)
+        audition_start = last_time
+        audition_end = add_minutes(audition_start, duration)
 
-        slot = Audition(start_time=slot_start, end_time=slot_end, audition_day=day)
-        db.session.add(slot)
+        audition = Audition(start_time=audition_start, end_time=audition_end, audition_day=day)
+        db.session.add(audition)
 
-        slots.append(slot)
+        auditions.append(audition)
 
-        last_time = add_minutes(slot_end, between)
+        last_time = add_minutes(audition_end, between)
 
     db.session.commit()
 
-    print('The following slots were generated:')
+    print('The following auditions were generated:')
 
-    for slot in slots:
-        print(str(slot))
+    for audition in auditions:
+        print(str(audition))
 
     print()
     print('================================================================================')
@@ -113,19 +113,19 @@ def manage_day(day):
     print()
     print('Viewing ' + day.get_date_string() + ' for show ' + day.show.name)
 
-    if len(day.audition_slots) == 0:
-        print('There are no audition slots on this day')
+    if len(day.auditions) == 0:
+        print('There are no auditions on this day')
 
-    for i in range(0, len(day.audition_slots)):
-        print(str(i + 1) + ' - ' + str(day.audition_slots[i].start_time) + ' - ' + str(day.audition_slots[i].end_time))
+    for i in range(0, len(day.auditions)):
+        print(str(i + 1) + ' - ' + str(day.auditions[i].start_time) + ' - ' + str(day.auditions[i].end_time))
 
     print('Available Options:')
-    print('a - Bulk add new slots')
+    print('a - Bulk add new auditions')
     print('x - Return to previous menu')
     option = input('Please select a day or an option')
 
     if option == 'a':
-        add_slots(day)
+        add_auditions(day)
         return
 
     elif option == 'x':
@@ -133,8 +133,8 @@ def manage_day(day):
         return
 
     else:
-        slot_index = int(option) - 1
-        manage_slot(day.audition_slots[slot_index])
+        audition_index = int(option) - 1
+        manage_audition(day.auditions[audition_index])
 
 
 def add_day(show):

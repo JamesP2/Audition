@@ -147,6 +147,6 @@ class Audition(db.Model):
         return 'audition %s' % str(self.id)
 
     def __str__(self):
-        return 'Audition Slot %s - %s (%s)' \
+        return 'Audition %s - %s (%s)' \
                % (str(self.start_time), str(self.end_time),
                   'Available' if self.is_available() else 'Unavailable')
