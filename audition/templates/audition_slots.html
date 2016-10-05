@@ -11,13 +11,22 @@
             </tr>
         </thead>
         {% for slot in show.get_audition_slots() %}
-            <tr class="audition-slot{% if not slot.is_available() %} danger{% endif %}">
+            <tr class="audition-slot{% if slot.auditionee_id == g.user.id %} success{% elif not slot.is_available() %} danger{% endif %}">
                 <td>{{ slot.get_date_time_string() }}</td>
-                <td>{{ "Available" if slot.is_available() else "Unavailable" }}</td>
+                <td>
+                    {% if slot.auditionee_id == g.user.id %}
+                        Booked
+                    {% else %}
+                        {{ "Available" if slot.is_available() else "Unavailable" }}
+                    {% endif %}
+                </td>
                 <td>
                     {% if slot.is_available() %}
                         <a href="{{ url_for("book_slot", slot_id=slot.id) }}">Book This Slot</a>
+                    {% elif slot.auditionee_id == g.user.id %}
+                        <a href="{{ url_for("cancel_slot", slot_id=slot.id) }}">Cancel This Slot</a>
                     {% endif %}
+
                 </td>
             </tr>
         {% endfor %}

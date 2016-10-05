@@ -1,5 +1,5 @@
-from flask import Flask, g, render_template, request, flash, redirect, url_for
-from flask_login import LoginManager, login_required, current_user, login_user, logout_user
+from flask import g, render_template, request, flash, redirect, url_for
+from flask_login import login_required, current_user, login_user, logout_user
 from audition import app, login_manager
 from audition.models import *
 
@@ -44,31 +44,38 @@ def before_request():
 @app.route('/')
 @login_required
 def index():
-    return render_template('shows.html',
+    return render_template('index.html',
                            shows=Show.query.all())
 
 
 @app.route('/me')
 @login_required
 def my_auditions():
-    return render_template('myauditions.html',
+    return render_template('my_auditions.html',
                            user=current_user)
 
 
-@app.route('/showauditions/<int:show_id>')
+@app.route('/shows')
 @login_required
-def audition_slots(show_id):
-    show = Show.query.get(show_id)
+def shows():
+    return render_template('shows.html',
+                           shows=Show.query.all())
 
-    if show is None:
+
+@app.route('/show/<int:show_id>')
+@login_required
+def show(show_id):
+    given_show = Show.query.get(show_id)
+
+    if given_show is None:
         flash('Invalid show ID', 'error')
         return redirect(url_for('index'))
 
-    return render_template('auditionslots.html',
-                           show=show)
+    return render_template('audition_slots.html',
+                           show=given_show)
 
 
-@app.route('/book/<int:slot_id>', methods=['GET', 'POST'])
+@app.route('/slot/<int:slot_id>/book', methods=['GET', 'POST'])
 @login_required
 def book_slot(slot_id):
     slot = AuditionSlot.query.get(slot_id)
@@ -77,7 +84,7 @@ def book_slot(slot_id):
         return redirect(url_for('index'))
 
     if request.method == 'GET':
-        return render_template('confirmslot.html',
+        return render_template('confirm_book.html',
                                show=slot.audition_day.show,
                                slot=slot)
 
@@ -85,5 +92,26 @@ def book_slot(slot_id):
     db.session.add(slot)
     db.session.commit()
 
-    flash('Your audition has been booked. We look forward to seeing you soon')
+    flash('Your audition has been booked. We look forward to seeing you soon', 'success')
+    return redirect(url_for('my_auditions'))
+
+
+@app.route('/slot/<int:slot_id>/cancel', methods=['GET', 'POST'])
+@login_required
+def cancel_slot(slot_id):
+    slot = AuditionSlot.query.get(slot_id)
+    if slot is None:
+        flash('Slot not found', 'error')
+        return redirect(url_for('index'))
+
+    if request.method == 'GET':
+        return render_template('confirm_cancel.html',
+                               show=slot.audition_day.show,
+                               slot=slot)
+
+    slot.auditionee = None
+    db.session.add(slot)
+    db.session.commit()
+
+    flash('Your audition has been cancelled.', 'primary')
     return redirect(url_for('my_auditions'))

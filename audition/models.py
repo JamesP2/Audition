@@ -11,25 +11,40 @@ class User(db.Model):
     password = db.Column(db.String(80))
 
     def is_authenticated(self):
+        """ Is the user authenticated? (always true since any user object is authed) """
         return True
 
     def is_active(self):
+        """ Is the user active? (always true since any user object is active) """
         return True
 
     def is_anonymous(self):
+        """ Is the user anon? (always false since any logged in user cannot be anonymous) """
         return False
 
     def get_id(self):
+        """ Get the ID of the user """
         return self.id
 
     def check_password(self, password):
+        """ Check the given password with the hashed password in the database """
         return check_password_hash(self.password, password)
 
     def set_password(self, password):
+        """ Generate a password hash based on the given password """
         self.password = generate_password_hash(password)
 
     def get_full_name(self):
+        """ Return the full name of the user """
         return self.first_name + ' ' + self.last_name
+
+    def auditioning_for(self, show):
+        """ Check if the user is auditioning for the given show """
+        for slot in self.audition_slots:
+            if slot.audition_day_show_id == show.id:
+                return True
+
+        return False
 
 
 class Show(db.Model):
@@ -37,6 +52,7 @@ class Show(db.Model):
     name = db.Column(db.String(50))
 
     def get_audition_dates_string(self):
+        """ Get a string of all the dates that the show is running auditions for """
         if len(self.audition_days) == 0:
             return 'No audition dates yet'
 
@@ -48,6 +64,7 @@ class Show(db.Model):
         return date_string[2:]
 
     def get_audition_slots(self):
+        """ Get all audition slots from all audition days for the given show """
         slots = []
 
         for day in self.audition_days:
@@ -57,6 +74,7 @@ class Show(db.Model):
         return slots
 
     def has_day(self, date):
+        """ Check to see if the show already has the given day """
         for day in self.audition_days:
             if day.date == date:
                 return True
@@ -69,9 +87,11 @@ class AuditionDay(db.Model):
     show = db.relationship('Show', backref='audition_days')
 
     def get_date_string(self):
+        """ Get date string in the form of Day D Month Year """
         return self.date.strftime('%A %d %B %Y')
 
     def get_short_date_string(self):
+        """ Get date string in the form of DD/MM/YY """
         return self.date.strftime('%d/%m/%y')
 
 
@@ -102,20 +122,25 @@ class AuditionSlot(db.Model):
     }
 
     def get_date_time_string(self):
+        """ Get the date time string of this slot in the form of DD/MM/YY HH:MM - HH:MM"""
         return self.audition_day.get_short_date_string() \
                + ' ' + self.get_start_time_string() + ' - ' + self.get_end_time_string()
 
     def get_long_date_time_string(self):
+        """ Get the date time string of this slot in the form of 'Day D Month Year' HH:MM - HH:MM"""
         return self.audition_day.get_date_string() \
                + ' ' + self.get_start_time_string() + ' - ' + self.get_end_time_string()
 
     def get_start_time_string(self):
+        """ Get the start time in the form HH:MM """
         return self.start_time.strftime('%H:%M')
 
     def get_end_time_string(self):
+        """ Get the end time in the form HH:MM """
         return self.end_time.strftime('%H:%M')
 
     def is_available(self):
+        """ Return True if the slot is not booked """
         return self.auditionee is None
 
     def __repr__(self):

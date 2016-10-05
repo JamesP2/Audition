@@ -14,7 +14,7 @@
             <tr>
                 <td>{{ show.name }}</td>
                 <td>{{ show.get_audition_dates_string() }}</td>
-                <td><a href="{{ url_for('audition_slots', show_id=show.id) }}">Show Audition Slots</a></td>
+                <td><a href="{{ url_for('show', show_id=show.id) }}">Show Audition Slots</a></td>
             </tr>
         {% endfor %}
         {% if shows|length == 0 %}

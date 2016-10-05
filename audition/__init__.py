@@ -8,4 +8,4 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
-# import audition.views
+import audition.views

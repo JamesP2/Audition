@@ -3,6 +3,6 @@
     <h1>Confirm Your Slot</h1>
     <p>You have chosen to audition for <strong>{{ show.name }}</strong> on the <strong>{{ slot.get_long_date_time_string() }}</strong>.</p>
     <form method="post" action="">
-        <button type="submit" class="btn btn-primary">Book This Slot</button> <a href="{{ url_for('audition_slots', show_id=show.id) }}" class="btn btn-default">Go Back</a>
+        <button type="submit" class="btn btn-primary">Book This Slot</button> <a href="{{ url_for('show', show_id=show.id) }}" class="btn btn-default">Go Back</a>
     </form>
 {% endblock %}

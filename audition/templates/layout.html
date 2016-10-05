@@ -1,8 +1,8 @@
 <html>
 <head>
     <title>AuditionSlot</title>
-    <link rel="stylesheet" href="/audition/static/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="/audition/static/css/site.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}" />
 
 </head>
 <body style="padding-top: 50px;">
@@ -15,12 +15,12 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="{{ url_for('index') }}">AuditionSlot</a>
+                <a class="navbar-brand" href="{{ url_for('index') }}">Auditon</a>
             </div>
             <div id="navbar" class="collapse navbar-collapse">
                 {% if g.user.is_authenticated  %}
                 <ul class="nav navbar-nav">
-                    <li><a href="{{ url_for('index') }}">Available Shows</a></li>
+                    <li><a href="{{ url_for('shows') }}">Available Shows</a></li>
                     <li><a href="{{ url_for('my_auditions') }}">My Auditions</a></li>
                 </ul>
                 <p class="navbar-text navbar-right">

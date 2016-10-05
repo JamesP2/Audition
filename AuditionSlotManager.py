@@ -1,4 +1,4 @@
-from AuditionSlot import *
+from audition.models import *
 from datetime import *
 
 
