@@ -5,7 +5,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}" />
 
 </head>
-<body style="padding-top: 50px;">
+<body>
     <nav class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
             <div class="navbar-header">
@@ -36,20 +36,22 @@
     </nav>
 
     <div class="container">
-    {% with messages = get_flashed_messages() %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-            <div class="alert">
-                <ul class="flashes">
-                    {% for message in messages %}
-                        <li>{{ message }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category if category != 'message' else 'warning' }} alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    {{ message }}
+                </div>
+            {% endfor %}
         {% endif %}
     {% endwith %}
 
-    {% block body %}{% endblock %}
 
+
+    {% block body %}{% endblock %}
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.1.1.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
     </div>
 </body>
 </html>

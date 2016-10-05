@@ -89,7 +89,7 @@ def add_slots(day):
         slot_start = last_time
         slot_end = add_minutes(slot_start, duration)
 
-        slot = AuditionSlot(start_time=slot_start, end_time=slot_end, audition_day=day)
+        slot = Audition(start_time=slot_start, end_time=slot_end, audition_day=day)
         db.session.add(slot)
 
         slots.append(slot)

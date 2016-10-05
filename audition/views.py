@@ -22,7 +22,7 @@ def login():
     user = User.query.filter_by(username=username).first()
 
     if user is None or not user.check_password(password):
-        flash('Username or Password incorrect', 'error')
+        flash('Username or Password incorrect', 'danger')
         return redirect(url_for('login'))
 
     login_user(user, remember=remember_me)
@@ -68,50 +68,50 @@ def show(show_id):
     given_show = Show.query.get(show_id)
 
     if given_show is None:
-        flash('Invalid show ID', 'error')
+        flash('Invalid show ID', 'danger')
         return redirect(url_for('index'))
 
-    return render_template('audition_slots.html',
+    return render_template('show.html',
                            show=given_show)
 
 
-@app.route('/slot/<int:slot_id>/book', methods=['GET', 'POST'])
+@app.route('/audition/<audition_id>/book', methods=['GET', 'POST'])
 @login_required
-def book_slot(slot_id):
-    slot = AuditionSlot.query.get(slot_id)
-    if slot is None:
-        flash('Slot not found', 'error')
+def book_audition(audition_id):
+    audition = Audition.query.get(audition_id)
+    if audition is None:
+        flash('Audition not found', 'danger')
         return redirect(url_for('index'))
 
     if request.method == 'GET':
         return render_template('confirm_book.html',
-                               show=slot.audition_day.show,
-                               slot=slot)
+                               show=audition.audition_day.show,
+                               audition=audition)
 
-    slot.auditionee = current_user
-    db.session.add(slot)
+    audition.auditionee = current_user
+    db.session.add(audition)
     db.session.commit()
 
     flash('Your audition has been booked. We look forward to seeing you soon', 'success')
     return redirect(url_for('my_auditions'))
 
 
-@app.route('/slot/<int:slot_id>/cancel', methods=['GET', 'POST'])
+@app.route('/audition/<int:audition_id>/cancel', methods=['GET', 'POST'])
 @login_required
-def cancel_slot(slot_id):
-    slot = AuditionSlot.query.get(slot_id)
-    if slot is None:
-        flash('Slot not found', 'error')
+def cancel_audition(audition_id):
+    audition = Audition.query.get(audition_id)
+    if audition is None:
+        flash('Audition not found', 'danger')
         return redirect(url_for('index'))
 
     if request.method == 'GET':
         return render_template('confirm_cancel.html',
-                               show=slot.audition_day.show,
-                               slot=slot)
+                               show=audition.audition_day.show,
+                               audition=audition)
 
-    slot.auditionee = None
-    db.session.add(slot)
+    audition.auditionee = None
+    db.session.add(audition)
     db.session.commit()
 
-    flash('Your audition has been cancelled.', 'primary')
+    flash('Your audition has been cancelled.', 'info')
     return redirect(url_for('my_auditions'))

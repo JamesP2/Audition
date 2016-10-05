@@ -11,11 +11,11 @@
             </tr>
         </thead>
         <tbody>
-            {% for slot in user.audition_slots %}
+            {% for audition in user.auditions %}
                 <tr>
-                    <td>{{ slot.audition_day.show.name }}</td>
-                    <td>{{ slot.get_date_time_string() }}</td>
-                    <td><a href="{{ url_for("cancel_slot", slot_id=slot.id) }}" class="danger">Cancel Slot</a></td>
+                    <td>{{ audition.audition_day.show.name }}</td>
+                    <td>{{ audition.get_date_time_string() }}</td>
+                    <td><a href="{{ url_for("cancel_audition", audition_id=audition.id) }}" class="danger">Cancel Audition</a></td>
                 </tr>
             {% endfor %}
             {% if user.audition_slots|length == 0 %}

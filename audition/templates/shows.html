@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block body %}
     <h1>Available Shows</h1>
-    <p>Shows that can be auditioned for are displayed below. Please choose a show to view available audition slots.</p>
+    <p>Shows that can be auditioned for are displayed below. Please choose a show to view available auditions.</p>
     <table class="table">
         <thead>
             <tr>
@@ -14,7 +14,7 @@
             <tr>
                 <td>{{ show.name }}</td>
                 <td>{{ show.get_audition_dates_string() }}</td>
-                <td><a href="{{ url_for('show', show_id=show.id) }}">Show Audition Slots</a></td>
+                <td><a href="{{ url_for('show', show_id=show.id) }}">Show Auditions</a></td>
             </tr>
         {% endfor %}
         {% if shows|length == 0 %}

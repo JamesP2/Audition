@@ -40,7 +40,7 @@ class User(db.Model):
 
     def auditioning_for(self, show):
         """ Check if the user is auditioning for the given show """
-        for slot in self.audition_slots:
+        for slot in self.auditions:
             if slot.audition_day_show_id == show.id:
                 return True
 
@@ -63,15 +63,15 @@ class Show(db.Model):
 
         return date_string[2:]
 
-    def get_audition_slots(self):
-        """ Get all audition slots from all audition days for the given show """
-        slots = []
+    def get_auditions(self):
+        """ Get all auditions from all audition days for the given show """
+        auditions = []
 
         for day in self.audition_days:
-            for slot in day.audition_slots:
-                slots.append(slot)
+            for audition in day.auditions:
+                auditions.append(audition)
 
-        return slots
+        return auditions
 
     def has_day(self, date):
         """ Check to see if the show already has the given day """
@@ -95,7 +95,7 @@ class AuditionDay(db.Model):
         return self.date.strftime('%d/%m/%y')
 
 
-class AuditionSlot(db.Model):
+class Audition(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     start_time = db.Column(db.Time)
@@ -104,10 +104,10 @@ class AuditionSlot(db.Model):
     audition_day_show_id = db.Column(db.Integer)
     audition_day_date = db.Column(db.Date)
 
-    audition_day = db.relationship('AuditionDay', backref='audition_slots')
+    audition_day = db.relationship('AuditionDay', backref='auditions')
 
     auditionee_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    auditionee = db.relationship('User', backref='audition_slots')
+    auditionee = db.relationship('User', backref='auditions')
 
     __table_args__ = (
         db.ForeignKeyConstraint(
