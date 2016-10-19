@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 from audition.models import *
 from datetime import *
 
@@ -246,7 +247,7 @@ def main():
         print('Available shows in Database:')
 
         for i in range(0, len(shows)):
-            print(str(i+1) + ' - ' + shows[i].name)
+            print(str(i + 1) + ' - ' + shows[i].name)
 
         print('Available options:')
         print('a - Add new show')
@@ -273,6 +274,7 @@ def main():
             return
 
         manage_show(shows[option - 1])
+
 
 print('audition Management Tool')
 main()
