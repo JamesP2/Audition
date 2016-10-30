@@ -1,6 +1,6 @@
-from flask import g, render_template, request, flash, redirect, url_for
+from flask import g, render_template, request, session, flash, redirect, url_for
 from flask_login import login_required, current_user, login_user, logout_user
-from audition import app, login_manager
+from audition import app, facebook, login_manager
 from audition.models import *
 
 
@@ -34,6 +34,56 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('index'))
+
+
+@app.route('/facebookLogin')
+def facebook_login():
+    return facebook.authorize(callback=url_for('facebook_authorized',
+                              next=request.args.get('next') or request.referrer or None,
+                              _external=True))
+
+
+@app.route('/facebookAuthorized')
+@facebook.authorized_handler
+def facebook_authorized(resp):
+    if resp is None:
+        return 'Access denied: reason=%s error=%s' % (
+            request.args['error_reason'],
+            request.args['error_description']
+        )
+
+    session['oauth_token'] = (resp['access_token'], '')
+    me = facebook.get('/me', data={
+        'fields': 'first_name,last_name,id'
+    })
+
+    provider = UserProvider.query.filter_by(user_uid=me.data['id'], provider_id='facebook').first()
+
+    if provider is not None:
+        login_user(provider.user)
+
+    else:
+        new_username = (me.data['first_name'] + '_' + me.data['last_name']).lower()
+        count = 1
+
+        while User.query.filter_by(username=new_username).first() is not None:
+            new_username = (me.data['first_name'] + '_' + me.data['last_name'] + str(count)).lower()
+            count += 1
+
+        new_user = User(first_name=me.data['first_name'], last_name=me.data['last_name'], username=new_username)
+        new_user.providers.append(UserProvider(user_uid=me.data['id'], provider_id='facebook'))
+
+        db.session.add(new_user)
+        db.session.commit()
+
+        login_user(new_user)
+
+        return redirect(request.args.get('next') or url_for('index'))
+
+
+@facebook.tokengetter
+def get_facebook_oauth_token():
+    return session.get('oauth_token')
 
 
 @app.before_request

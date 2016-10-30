@@ -28,7 +28,7 @@ class User(db.Model):
 
     def check_password(self, password):
         """ Check the given password with the hashed password in the database """
-        return check_password_hash(self.password, password)
+        return self.password is not None and self.password != '' and check_password_hash(self.password, password)
 
     def set_password(self, password):
         """ Generate a password hash based on the given password """
@@ -45,6 +45,15 @@ class User(db.Model):
                 return True
 
         return False
+
+
+class UserProvider(db.Model):
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    provider_id = db.Column(db.String(20), primary_key=True)
+
+    user = db.relationship('User', backref='providers')
+
+    user_uid = db.Column(db.String(200))
 
 
 class Show(db.Model):
