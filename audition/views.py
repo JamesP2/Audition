@@ -1,5 +1,6 @@
 from flask import g, render_template, request, session, flash, redirect, url_for
 from flask_login import login_required, current_user, login_user, logout_user
+from flask_oauthlib.client import OAuthException
 from audition import app, facebook, login_manager
 from audition.models import *
 
@@ -38,19 +39,25 @@ def logout():
 
 @app.route('/facebookLogin')
 def facebook_login():
-    return facebook.authorize(callback=url_for('facebook_authorized',
-                              next=request.args.get('next') or request.referrer or None,
-                              _external=True))
+    callback_url = url_for('facebook_authorized',
+                           next=request.args.get('next') or request.referrer or None,
+                           _external=True)
+
+    return facebook.authorize(callback=callback_url)
 
 
 @app.route('/facebookAuthorized')
-@facebook.authorized_handler
-def facebook_authorized(resp):
+def facebook_authorized():
+    resp = facebook.authorized_response()
+
     if resp is None:
         return 'Access denied: reason=%s error=%s' % (
             request.args['error_reason'],
             request.args['error_description']
         )
+
+    if isinstance(resp, OAuthException):
+        return 'Access denied: %s' % resp.message
 
     session['oauth_token'] = (resp['access_token'], '')
     me = facebook.get('/me', data={
