@@ -54,7 +54,7 @@ def facebook_authorized(resp):
 
     session['oauth_token'] = (resp['access_token'], '')
     me = facebook.get('/me', data={
-        'fields': 'first_name,last_name,id'
+        'fields': 'first_name,last_name,id,email'
     })
 
     provider = UserProvider.query.filter_by(user_uid=me.data['id'], provider_id='facebook').first()
@@ -70,8 +70,9 @@ def facebook_authorized(resp):
             new_username = (me.data['first_name'] + '_' + me.data['last_name'] + str(count)).lower()
             count += 1
 
-        new_user = User(first_name=me.data['first_name'], last_name=me.data['last_name'], username=new_username)
-        new_user.providers.append(UserProvider(user_uid=me.data['id'], provider_id='facebook'))
+        new_user = User(first_name=me.data['first_name'], last_name=me.data['last_name'], username=new_username,
+                        email=me.data['email'])
+        new_user.providers.append(UserProvider(user_uid=me.data['id'], provider_id='facebook', email=me.data['email']))
 
         db.session.add(new_user)
         db.session.commit()
@@ -122,6 +123,23 @@ def show(show_id):
         return redirect(url_for('index'))
 
     return render_template('show.html',
+                           show=given_show)
+
+
+@app.route('/show/<int:show_id>/manage')
+@login_required
+def manage_show(show_id):
+    given_show = Show.query.get(show_id)
+
+    if given_show is None:
+        flash('Invalid show ID', 'danger')
+        return redirect(url_for('index'))
+
+    if given_show not in current_user.managed_shows:
+        flash('You do not have permission to manage this show.', 'danger')
+        return redirect(url_for('index'))
+
+    return render_template('manage_show.html',
                            show=given_show)
 
 

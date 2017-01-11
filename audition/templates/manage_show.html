@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block body %}
+    <h1>Manage {{ show.name }}</h1>
+    <p>Here you can view the full audition schedule for your show.</p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Time</th>
+                <th>Availability</th>
+                <th></th>
+            </tr>
+        </thead>
+        {% for audition in show.get_auditions() %}
+            <tr class="audition-slot{% if not audition.is_available() %} active{% endif %}">
+                <td>{{ audition.get_date_time_string() }}</td>
+                <td>
+                        {{ "Not Booked" if audition.is_available() else "Booked By " + audition.auditionee.get_full_name() }}
+                </td>
+                <td>
+
+                </td>
+            </tr>
+        {% endfor %}
+        {% if show.get_auditions()|length == 0 %}
+            <tr>
+                <td colspan="3" style="font-style: italic; text-align: center">No Auditions Available. Have they been added?</td>
+            </tr>
+        {% endif %}
+    </table>
+{% endblock %}

@@ -1,5 +1,14 @@
+import html, re
+
 from audition.database import db
+from hashlib import md5
+from urllib.parse import quote_plus
 from werkzeug.security import check_password_hash, generate_password_hash
+
+show_managers = db.Table('show_managers',
+                         db.Column('show_id', db.Integer, db.ForeignKey('show.id')),
+                         db.Column('user_id', db.Integer, db.ForeignKey('user.id'))
+                         )
 
 
 class User(db.Model):
@@ -9,6 +18,10 @@ class User(db.Model):
 
     username = db.Column(db.String(30))
     password = db.Column(db.String(80))
+    email = db.Column(db.String(200))
+
+    managed_shows = db.relationship('Show', secondary=show_managers,
+                                    backref='managers')
 
     def is_authenticated(self):
         """ Is the user authenticated? (always true since any user object is authed) """
@@ -38,6 +51,17 @@ class User(db.Model):
         """ Return the full name of the user """
         return self.first_name + ' ' + self.last_name
 
+    def get_avatar_url(self):
+        """ Return an URL for an avatar. If a FB provider exists use that, otherwise use gravatar """
+        if len(self.providers) > 0:
+            for provider in self.providers:
+                if provider.provider_id == 'facebook':
+                    return 'http://graph.facebook.com/' + provider.user_uid + '/picture'
+
+        email = self.email if self.email is not None else ''
+
+        return 'https://www.gravatar.com/avatar/' + md5(str.encode(email)).hexdigest() + '?d=retro'
+
     def auditioning_for(self, show):
         """ Check if the user is auditioning for the given show """
         for slot in self.auditions:
@@ -52,6 +76,7 @@ class UserProvider(db.Model):
     provider_id = db.Column(db.String(20), primary_key=True)
 
     user = db.relationship('User', backref='providers')
+    email = db.Column(db.String(200))
 
     user_uid = db.Column(db.String(200))
 
@@ -159,3 +184,36 @@ class Audition(db.Model):
         return 'Audition %s - %s (%s)' \
                % (str(self.start_time), str(self.end_time),
                   'Available' if self.is_available() else 'Unavailable')
+
+
+class Comment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    time = db.Column(db.Time)
+    last_edit_time = db.Column(db.Time)
+
+    edits = db.Column(db.Integer)
+
+    comment_body = db.Column(db.String(2000))
+
+    audition_id = db.Column(db.Integer, db.ForeignKey('audition.id'))
+    audition = db.relationship('Audition', backref='comments')
+
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user = db.relationship('User', backref='comments')
+
+    __mapper_args__ = {
+        'order_by': time
+    }
+
+    def set_comment_body(self, body):
+        tag_re = re.compile(r'(<!--.*?-->|<[^>]*>)')
+
+        # Remove well-formed tags, fixing mistakes by legitimate users
+        no_tags = tag_re.sub('', body)
+
+        # Clean up anything else by escaping
+        self.comment_body = html.escape(no_tags)
+
+    def get_comment_html(self):
+        return '<p>' + self.comment_body.replace('\n', '</p>\n<p>')

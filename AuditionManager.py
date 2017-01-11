@@ -8,8 +8,7 @@ def add_minutes(base_time, minutes):
             + timedelta(minutes=minutes)).time()
 
 
-def manage_users():
-    print()
+def print_users():
     users = User.query.all()
 
     if len(users) == 0:
@@ -17,6 +16,12 @@ def manage_users():
 
     for user in users:
         print(str(user.id) + ': ' + user.username + ' - ' + user.get_full_name())
+
+
+def manage_users():
+    print()
+
+    print_users()
 
     print('Available Options:')
     print('a - Add user')
@@ -29,6 +34,7 @@ def manage_users():
         username = input('Enter username: ')
         first = input('Enter first name: ')
         last = input('Enter last name: ')
+        email = input('Enter email: ')
         password = input('Enter password: ')
         password2 = input('Confirm password: ')
 
@@ -37,7 +43,7 @@ def manage_users():
             manage_users()
             return
 
-        user = User(username=username, first_name=first, last_name=last)
+        user = User(username=username, first_name=first, last_name=last, email=email)
         user.set_password(password)
 
         db.session.add(user)
@@ -186,6 +192,60 @@ def manage_days(show):
         manage_day(show.audition_days[day_index])
 
 
+def manage_show_managers(show):
+    print()
+
+    if len(show.managers) == 0:
+        print('No Managers assigned')
+
+    for user in show.managers:
+        print(str(user.id) + ': ' + user.username + ' - ' + user.get_full_name())
+
+    print('Available options:')
+    print('a - Add Manager')
+    print('d - Delete Manager')
+    print('x - Return to show menu')
+    option = input('Please select a day or an option')
+
+    if option == 'a':
+        print_users()
+        id = input('Enter a user ID to add management rights to: ')
+        user = User.query.get(id)
+
+        if user is not None and user not in show.managers:
+            user.managed_shows.append(show)
+            print('Show Manager Added')
+            db.session.add(show)
+            db.session.commit()
+
+        else:
+            print('User already manages this show or does not exist')
+        manage_show_managers(show)
+
+    if option == 'd':
+        print_users()
+        id = input('Enter a user ID to revoke management from: ')
+        user = User.query.get(id)
+
+        if user is not None and user in show.managers:
+            user.managed_shows.remove(show)
+            db.session.add(show)
+            db.session.commit()
+            print('Show Manager Removed')
+
+        else:
+            print('User does not manage this show or does not exist')
+        manage_show_managers(show)
+
+    elif option == 'x':
+        manage_show(show)
+        return
+
+    else:
+        day_index = int(option) - 1
+        manage_day(show.audition_days[day_index])
+
+
 def create_show():
     print()
     name = input('Enter name for new show: ')
@@ -203,13 +263,18 @@ def manage_show(show):
     print('Managing show ' + show.name)
     print('Available options:')
     print('m - Manage audition days')
-    print('d - Delete Show')
+    print('a - Manage show managers')
+    print('d - Delete show')
     print('x - Return to main menu')
 
     option = input('Please select an option: ').lower()
 
     if option == 'm':
         manage_days(show)
+        return
+
+    if option == 'a':
+        manage_show_managers(show)
         return
 
     elif option == 'd':
