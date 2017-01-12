@@ -18,7 +18,7 @@
                     <td><a href="{{ url_for("cancel_audition", audition_id=audition.id) }}" class="danger">Cancel Audition</a></td>
                 </tr>
             {% endfor %}
-            {% if user.audition_slots|length == 0 %}
+            {% if user.auditions|length == 0 %}
                 <tr>
                     <td colspan="3" style="font-style: italic; text-align: center">You have not booked any auditions.</td>
                 </tr>
