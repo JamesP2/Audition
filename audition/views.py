@@ -1,3 +1,4 @@
+import sys
 from flask import g, render_template, request, session, flash, redirect, url_for
 from flask_login import login_required, current_user, login_user, logout_user
 from flask_oauthlib.client import OAuthException
@@ -66,7 +67,7 @@ def facebook_authorized():
 
     provider = UserProvider.query.filter_by(user_uid=me.data['id'], provider_id='facebook').first()
 
-    if provider is not None:
+    if provider is not None and provider.user is not None:
         login_user(provider.user)
 
     else:
@@ -86,7 +87,7 @@ def facebook_authorized():
 
         login_user(new_user)
 
-        return redirect(request.args.get('next') or url_for('index'))
+    return redirect(request.args.get('next') or url_for('index'))
 
 
 @facebook.tokengetter
