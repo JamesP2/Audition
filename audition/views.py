@@ -1,9 +1,9 @@
-import sys
 from flask import g, render_template, request, session, flash, redirect, url_for
 from flask_login import login_required, current_user, login_user, logout_user
 from flask_oauthlib.client import OAuthException
 from audition import app, facebook, login_manager
 from audition.models import *
+from datetime import datetime
 
 
 @login_manager.user_loader
@@ -151,7 +151,38 @@ def manage_show(show_id):
                            show=given_show)
 
 
-@app.route('/audition/<audition_id>/book', methods=['GET', 'POST'])
+@app.route('/audition/<int:audition_id>', methods=['GET', 'POST'])
+@login_required
+def manage_audition(audition_id):
+    audition = Audition.query.get(audition_id)
+
+    if audition is None:
+        flash('Audition not found', 'danger')
+        return redirect(url_for('index'))
+
+    if audition.auditionee is None:
+        flash('Audition is not booked by anyone', 'danger')
+        return redirect(url_for('index'))
+
+    if audition.auditionee != current_user and current_user not in audition.get_show().managers:
+        flash('You do not have permission to view this audition', 'danger')
+        return redirect(url_for('index'))
+
+    if request.method == 'POST':
+        comment = Comment(time=datetime.now(), audition=audition, user=current_user)
+        comment.set_comment_body(request.form['comment_text'])
+
+        db.session.add(comment)
+        db.session.commit()
+
+        return redirect(url_for('manage_audition', audition_id=audition_id))
+
+    return render_template('audition.html' if current_user in audition.get_show().managers else 'my_audition.html',
+                           show=audition.get_show(),
+                           audition=audition)
+
+
+@app.route('/audition/<int:audition_id>/book', methods=['GET', 'POST'])
 @login_required
 def book_audition(audition_id):
     audition = Audition.query.get(audition_id)

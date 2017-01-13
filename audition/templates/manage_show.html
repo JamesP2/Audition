@@ -17,7 +17,9 @@
                         {{ "Not Booked" if audition.is_available() else "Booked By " + audition.auditionee.get_full_name() }}
                 </td>
                 <td>
-
+                    {% if not audition.is_available() %}
+                        <a href="{{ url_for("manage_audition", audition_id=audition.id) }}">More Info</a>
+                    {% endif %}
                 </td>
             </tr>
         {% endfor %}

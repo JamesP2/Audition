@@ -21,4 +21,5 @@ facebook = oauth.remote_app('facebook',
                             request_token_params={'scope': 'email'}
 )
 
+import audition.filters
 import audition.views

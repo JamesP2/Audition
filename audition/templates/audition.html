@@ -1,0 +1,61 @@
+{% extends "layout.html" %}
+{% block body %}
+    <h1>Audition for {{ show.name }}</h1>
+    <div class="media">
+        <div class="media-left media-middle">
+            <a href="#">
+                <img class="media-object" src="{{ audition.auditionee.get_avatar_url() }}" alt="...">
+            </a>
+        </div>
+        <div class="media-body">
+            <h4 class="media-heading">
+                {{ audition.audition_day.get_date_string() }} at
+                {{ audition.get_start_time_string() }} until {{ audition.get_end_time_string() }}
+            </h4>
+            <p>{{ audition.auditionee.get_full_name() }}</p>
+        </div>
+    </div>
+    <h2>Comments</h2>
+    <p>Comments are viewable by all users that manage this particular show.</p>
+    <p>Comments can be shown to the auditionee as feedback. Click "Make Viewable For Auditionee" for the comment(s) you want them to see.</p>
+    <p>&nbsp;</p>
+    {% if audition.comments|length > 0 %}
+        <ul class="media-list">
+            {% for comment in audition.comments %}
+                <li class="media">
+                    <div class="media-left media-top">
+                        <img class="media-object" src="{{ comment.user.get_avatar_url() }}" alt="...">
+                        <p class="small" style="text-align: center; width:100%">{{ comment.user.get_full_name() }}</p>
+                        <p class="small" style="text-align: center; width:100%">{{ comment.get_date_string() }}</p>
+                        <p class="small" style="text-align: center; width:100%">{{ comment.get_time_string() }}</p>
+                    </div>
+                    <div class="media-body">
+                        {{ comment.comment_body | safe | nl2br }}
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <a href="#" id='postCommentLink' onclick="$('#commentPoster').slideDown(); $('#postCommentLink').slideUp();">
+        Post Comment
+    </a>
+
+    <div id="commentPoster" style="display: none;">
+        <div class="media">
+        <div class="media-left media-top">
+            <a href="#">
+                <img class="media-object" src="{{ g.user.get_avatar_url() }}" alt="...">
+            </a>
+        </div>
+        <div class="media-body">
+            <form action="" method="post" id="commentForm">
+                <div class="form-group">
+                    <textarea class="form-control" rows="3" placeholder="Type your comment here" name="comment_text" form="commentForm"></textarea>
+                </div>
+                <button type="submit" class="btn">Post</button>
+            </form>
+        </div>
+    </div>
+    </div>
+{% endblock %}

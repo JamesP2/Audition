@@ -5,7 +5,7 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Show Name</th>
+                <th>Show Title</th>
                 <th>Show Audition Dates</th>
                 <th></th>
             </tr>
@@ -14,7 +14,13 @@
             <tr>
                 <td>{{ show.name }}</td>
                 <td>{{ show.get_audition_dates_string() }}</td>
-                <td><a href="{{ url_for('show', show_id=show.id) }}">Show Auditions</a></td>
+                <td>
+                    {% if g.user in show.managers %}
+                        <a href="{{ url_for('manage_show', show_id=show.id) }}">Manage Show</a>
+                    {% else %}
+                        <a href="{{ url_for('show', show_id=show.id) }}">Show Auditions</a>
+                    {% endif %}
+                </td>
             </tr>
         {% endfor %}
         {% if shows|length == 0 %}

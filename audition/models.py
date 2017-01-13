@@ -173,9 +173,21 @@ class Audition(db.Model):
         """ Get the end time in the form HH:MM """
         return self.end_time.strftime('%H:%M')
 
+    def get_show(self):
+        """ Get the show for this audition """
+        return self.audition_day.show
+
     def is_available(self):
         """ Return True if the slot is not booked """
         return self.auditionee is None
+
+    def has_feedback_for_auditionee(self):
+        """ Return True if a comment has been set to be viewable by the auditionee """
+        for comment in self.comments:
+            if comment.viewable_by_auditionee:
+                return True
+
+        return False
 
     def __repr__(self):
         return 'audition %s' % str(self.id)
@@ -189,10 +201,10 @@ class Audition(db.Model):
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
-    time = db.Column(db.Time)
-    last_edit_time = db.Column(db.Time)
+    time = db.Column(db.DateTime)
+    last_edit_time = db.Column(db.DateTime)
 
-    edits = db.Column(db.Integer)
+    edits = db.Column(db.Integer, default=0)
 
     comment_body = db.Column(db.String(2000))
 
@@ -201,6 +213,8 @@ class Comment(db.Model):
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     user = db.relationship('User', backref='comments')
+
+    viewable_by_auditionee = db.Column(db.Boolean, default=False)
 
     __mapper_args__ = {
         'order_by': time
@@ -216,4 +230,10 @@ class Comment(db.Model):
         self.comment_body = html.escape(no_tags)
 
     def get_comment_html(self):
-        return '<p>' + self.comment_body.replace('\n', '</p>\n<p>')
+        return '<p>' + self.comment_body.replace('\n', '</p>\n<p>') + '</p>'
+
+    def get_date_string(self):
+        return self.time.strftime('%d/%m/%y')
+
+    def get_time_string(self):
+        return self.time.strftime('%H:%M')

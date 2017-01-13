@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block body %}
+    <h1>Your Audition for {{ show.name }}</h1>
+    <p>
+        Your audition is on {{ audition.audition_day.get_date_string() }} at
+        {{ audition.get_start_time_string() }} until {{ audition.get_end_time_string() }}
+    </p>
+    {% if audition.has_feedback_for_auditionee() %}
+        <h2>Feedback</h2>
+    {% else %}
+        <p style="font-style: italic;">No feedback has been submitted for your audition yet.</p>
+    {% endif %}
+{% endblock %}
