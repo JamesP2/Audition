@@ -129,7 +129,7 @@ def manage_day(day):
     print('Available Options:')
     print('a - Bulk add new auditions')
     print('x - Return to previous menu')
-    option = input('Please select a day or an option')
+    option = input('Please select a day or an option: ')
 
     if option == 'a':
         add_auditions(day)
@@ -147,12 +147,12 @@ def manage_day(day):
 def add_day(show):
     print()
     print('Adding a new date to ' + show.name)
-    date_string = input('Please enter a date in the form DD/MM/YY')
+    date_string = input('Please enter a date in the form DD/MM/YY: ')
 
     given_date = datetime.strptime(date_string, '%d/%m/%y').date()
 
     print('The given date is ' + given_date.strftime('%A %d %B %Y'))
-    answer = input('Is this correct? [Y/n]').lower()
+    answer = input('Is this correct? [Y/n]: ').lower()
 
     if answer == '' or answer == 'y' or answer == 'yes':
         day = AuditionDay(show=show, date=given_date)
@@ -177,7 +177,7 @@ def manage_days(show):
     print('Available options:')
     print('a - Add new day')
     print('x - Return to show menu')
-    option = input('Please select a day or an option')
+    option = input('Please select a day or an option: ')
 
     if option == 'a':
         add_day(show)
@@ -205,7 +205,7 @@ def manage_show_managers(show):
     print('a - Add Manager')
     print('d - Delete Manager')
     print('x - Return to show menu')
-    option = input('Please select a day or an option')
+    option = input('Please select a day or an option: ')
 
     if option == 'a':
         print_users()
@@ -304,42 +304,42 @@ def main():
     shows = Show.query.all()
 
     if len(shows) == 0:
-        print('There are no shows in the database. Creating one now...')
-        create_show()
-        return
+        prompt = 'Please enter an option: '
+        print('There are no shows in the database.')
 
     else:
+        prompt = 'Please select a show or enter an option: '
         print('Available shows in Database:')
 
         for i in range(0, len(shows)):
             print(str(i + 1) + ' - ' + shows[i].name)
 
-        print('Available options:')
-        print('a - Add new show')
-        print('u - Manage Users')
-        print('x - Exit')
+    print('Available options:')
+    print('a - Add new show')
+    print('u - Manage Users')
+    print('x - Exit')
 
-        option = input('Please select a show or enter an option')
+    option = input(prompt)
 
-        if option == 'x':
-            return
+    if option == 'x':
+        return
 
-        elif option == 'a':
-            create_show()
-            return
+    elif option == 'a':
+        create_show()
+        return
 
-        elif option == 'u':
-            manage_users()
-            return
+    elif option == 'u':
+        manage_users()
+        return
 
-        option = int(option)
+    option = int(option)
 
-        if option > len(shows):
-            print('Number specified outside of range. Exiting')
-            return
+    if option > len(shows):
+        print('Number specified outside of range. Exiting')
+        return
 
-        manage_show(shows[option - 1])
+    manage_show(shows[option - 1])
 
 
-print('audition Management Tool')
+print('Audition Management Tool')
 main()
