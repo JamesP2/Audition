@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% block title %}My Audition{% endblock %}
 {% block body %}
     <h1>Your Audition for {{ show.name }}</h1>
     <p>
@@ -7,6 +8,26 @@
     </p>
     {% if audition.has_feedback_for_auditionee() %}
         <h2>Feedback</h2>
+        <ul class="media-list">
+            {% for comment in audition.comments if comment.viewable_by_auditionee %}
+                <li class="media">
+                    <div class="media-left media-top">
+                        <img class="media-object avatar" src="{{ comment.user.get_avatar_url() }}" alt="...">
+                    </div>
+                    <div class="media-body">
+                        <h4 class="media-heading">
+                            {{ comment.user.get_full_name() }}
+                            <small>
+                                {{ comment.get_date_string() }} {{ comment.get_time_string() }}
+                            </small>
+                        </h4>
+                        <p>
+                            {{ comment.comment_body | safe | nl2br }}
+                        </p>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
     {% else %}
         <p style="font-style: italic;">No feedback has been submitted for your audition yet.</p>
     {% endif %}

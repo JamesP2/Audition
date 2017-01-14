@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.min.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-social.css') }}" />
+{% endblock %}
+{% block body %}
+    <h1>UMMTS Audition Registration</h1>
+    {% if site_enabled %}
+        <p>Welcome to the UMMTS Online Audition Registration System</p>
+        <p>Please sign in with Facebook to continue.</p>
+        <div class="row">
+            <div class="col-md-4"></div>
+            <div class="col-md-4">
+                <a class="btn btn-block btn-social btn-facebook" href="{{ url_for('facebook_login', next='/') }}">
+                    <span class="fa fa-facebook"></span> Sign in with Facebook
+                </a>
+            </div>
+            <div class="col-md-4"></div>
+        </div>
+    {% else %}
+        <p>Currently we are not running auditions, please check back later.</p>
+    {% endif %}
+{% endblock %}

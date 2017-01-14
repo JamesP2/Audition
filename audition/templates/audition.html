@@ -1,18 +1,16 @@
 {% extends "layout.html" %}
+{% block title %}Manage Audition{% endblock %}
 {% block body %}
     <h1>Audition for {{ show.name }}</h1>
     <div class="media">
         <div class="media-left media-middle">
             <a href="#">
-                <img class="media-object" src="{{ audition.auditionee.get_avatar_url() }}" alt="...">
+                <img class="media-object avatar" src="{{ audition.auditionee.get_avatar_url() }}" alt="Avatar">
             </a>
         </div>
         <div class="media-body">
-            <h4 class="media-heading">
-                {{ audition.audition_day.get_date_string() }} at
-                {{ audition.get_start_time_string() }} until {{ audition.get_end_time_string() }}
-            </h4>
-            <p>{{ audition.auditionee.get_full_name() }}</p>
+            <h4 class="media-heading">{{ audition.audition_day.get_date_string() }} at {{ audition.get_start_time_string() }} until {{ audition.get_end_time_string() }}</h4>
+            {{ audition.auditionee.get_full_name() }}
         </div>
     </div>
     <h2>Comments</h2>
@@ -22,15 +20,32 @@
     {% if audition.comments|length > 0 %}
         <ul class="media-list">
             {% for comment in audition.comments %}
-                <li class="media">
+                <li class="media {% if comment.viewable_by_auditionee %} viewable-comment {% endif %}">
                     <div class="media-left media-top">
-                        <img class="media-object" src="{{ comment.user.get_avatar_url() }}" alt="...">
-                        <p class="small" style="text-align: center; width:100%">{{ comment.user.get_full_name() }}</p>
-                        <p class="small" style="text-align: center; width:100%">{{ comment.get_date_string() }}</p>
-                        <p class="small" style="text-align: center; width:100%">{{ comment.get_time_string() }}</p>
+                        <img class="media-object avatar" src="{{ comment.user.get_avatar_url() }}" alt="...">
                     </div>
                     <div class="media-body">
-                        {{ comment.comment_body | safe | nl2br }}
+                        <h4 class="media-heading">
+                            {{ comment.user.get_full_name() }}
+                            <small>
+                                {{ comment.get_date_string() }} {{ comment.get_time_string() }}
+                                {% if comment.viewable_by_auditionee %}
+                                    <span style="font-style: italic; font-weight: bold; color: darkred">
+                                        This comment is viewable by the auditionee
+                                    </span>
+                                {% endif %}
+                            </small>
+                        </h4>
+                        <p>
+                            {{ comment.comment_body | safe | nl2br }}
+                        </p>
+                        <p class="small">
+                            {% if comment.viewable_by_auditionee %}
+                                <a href="{{ url_for('toggle_comment_viewable', comment_id=comment.id) }}">Hide From Auditionee</a>
+                            {% else %}
+                                <a href="{{ url_for('toggle_comment_viewable', comment_id=comment.id) }}">Show To Auditionee</a>
+                            {% endif %}
+                        </p>
                     </div>
                 </li>
             {% endfor %}

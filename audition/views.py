@@ -40,6 +40,10 @@ def logout():
 
 @app.route('/facebookLogin')
 def facebook_login():
+    if not bool(app.config['SITE_ENABLED']):
+        flash('Audition Booking is currently unavailable.', 'warning')
+        return redirect(url_for('index'))
+
     callback_url = url_for('facebook_authorized',
                            next=request.args.get('next') or request.referrer or None,
                            _external=True)
@@ -101,10 +105,11 @@ def before_request():
 
 
 @app.route('/')
-@login_required
 def index():
-    return render_template('index.html',
-                           shows=Show.query.all())
+    if current_user.is_authenticated:
+        return render_template('index.html')
+
+    return render_template('landing_page.html', site_enabled=bool(app.config['SITE_ENABLED']))
 
 
 @app.route('/me')
@@ -180,6 +185,27 @@ def manage_audition(audition_id):
     return render_template('audition.html' if current_user in audition.get_show().managers else 'my_audition.html',
                            show=audition.get_show(),
                            audition=audition)
+
+
+@app.route('/comment/<int:comment_id>/toggle_viewable')
+@login_required
+def toggle_comment_viewable(comment_id):
+    comment = Comment.query.get(comment_id)
+
+    if comment is None:
+        flash('Comment not found', 'danger')
+        return redirect(url_for('index'))
+
+    if current_user not in comment.audition.get_show().managers:
+        flash('You do not have permission to edit this comment', 'danger')
+        return redirect(url_for('index'))
+
+    comment.viewable_by_auditionee = not comment.viewable_by_auditionee
+
+    db.session.add(comment)
+    db.session.commit()
+
+    return redirect(url_for('manage_audition', audition_id=comment.audition_id))
 
 
 @app.route('/audition/<int:audition_id>/book', methods=['GET', 'POST'])
