@@ -1,9 +1,12 @@
 from flask import Flask
 from flask_login import LoginManager
 from flask_oauthlib.client import OAuth
+from flaskext.markdown import Markdown
 
 app = Flask(__name__)
 app.config.from_pyfile('../config.py')
+
+markdown = Markdown(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -21,5 +24,4 @@ facebook = oauth.remote_app('facebook',
                             request_token_params={'scope': 'email'}
 )
 
-import audition.filters
 import audition.views

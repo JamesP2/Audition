@@ -220,18 +220,6 @@ class Comment(db.Model):
         'order_by': time
     }
 
-    def set_comment_body(self, body):
-        tag_re = re.compile(r'(<!--.*?-->|<[^>]*>)')
-
-        # Remove well-formed tags, fixing mistakes by legitimate users
-        no_tags = tag_re.sub('', body)
-
-        # Clean up anything else by escaping
-        self.comment_body = html.escape(no_tags)
-
-    def get_comment_html(self):
-        return '<p>' + self.comment_body.replace('\n', '</p>\n<p>') + '</p>'
-
     def get_date_string(self):
         return self.time.strftime('%d/%m/%y')
 

@@ -22,7 +22,7 @@
                             </small>
                         </h4>
                         <p>
-                            {{ comment.comment_body | safe | nl2br }}
+                            {{ comment.comment_body | markdown | safe }}
                         </p>
                     </div>
                 </li>

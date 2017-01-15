@@ -37,7 +37,7 @@
                             </small>
                         </h4>
                         <p>
-                            {{ comment.comment_body | safe | nl2br }}
+                            {{ comment.comment_body | markdown | safe }}
                         </p>
                         <p class="small">
                             {% if comment.viewable_by_auditionee %}
@@ -60,7 +60,7 @@
         <div class="media">
         <div class="media-left media-top">
             <a href="#">
-                <img class="media-object" src="{{ g.user.get_avatar_url() }}" alt="...">
+                <img class="media-object avatar" src="{{ g.user.get_avatar_url() }}" alt="...">
             </a>
         </div>
         <div class="media-body">

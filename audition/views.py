@@ -174,8 +174,8 @@ def manage_audition(audition_id):
         return redirect(url_for('index'))
 
     if request.method == 'POST':
-        comment = Comment(time=datetime.now(), audition=audition, user=current_user)
-        comment.set_comment_body(request.form['comment_text'])
+        comment = Comment(time=datetime.now(), audition=audition, user=current_user,
+                          comment_body=request.form['comment_text'])
 
         db.session.add(comment)
         db.session.commit()
