@@ -6,6 +6,7 @@
     <p>Please pick a vacant audition</p>
     {% for audition_day in show.audition_days if audition_day.auditions|length > 0 %}
         <h2>{{ audition_day.get_date_string() }}</h2>
+        {{ audition_day.description | markdown | safe if audition_day.description}}
         <table class="table">
             <thead>
                 <tr>
@@ -30,7 +31,6 @@
                         {% elif audition.is_available() and not g.user.auditioning_for(show) %}
                             <a href="{{ url_for("book_audition", audition_id=audition.id) }}">Book Audition</a>
                         {% endif %}
-
                     </td>
                 </tr>
             {% endfor %}

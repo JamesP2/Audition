@@ -172,6 +172,22 @@ def manage_show_description(show_id):
     return render_template('manage_show_description.html', show=given_show)
 
 
+@app.route('/show/<int:show_id>/<string:date>/manage/description', methods=['GET', 'POST'])
+@login_required
+def manage_day_description(show_id, date):
+    given_day = AuditionDay.query.get((date, show_id))
+
+    if request.method == 'POST':
+        given_day.description = request.form['description']
+
+        db.session.add(given_day)
+        db.session.commit()
+
+        return redirect(url_for('manage_show', show_id=show_id))
+
+    return render_template('manage_day_description.html', audition_day=given_day)
+
+
 @app.route('/audition/<int:audition_id>', methods=['GET', 'POST'])
 @login_required
 def manage_audition(audition_id):
