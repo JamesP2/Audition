@@ -243,6 +243,10 @@ def cancel_audition(audition_id):
                                audition=audition)
 
     audition.auditionee = None
+
+    for comment in audition.comments:
+        db.session.delete(comment)
+
     db.session.add(audition)
     db.session.commit()
 
