@@ -3,38 +3,40 @@
 {% block body %}
     <h1>Auditions for {{ show.name }}</h1>
     <p>Please pick a vacant audition</p>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Time</th>
-                <th>Availability</th>
-                <th></th>
-            </tr>
-        </thead>
-        {% for audition in show.get_auditions() %}
-            <tr class="audition-slot{% if audition.auditionee_id == g.user.id %} success{% elif not audition.is_available() %} danger{% endif %}">
-                <td>{{ audition.get_date_time_string() }}</td>
-                <td>
-                    {% if audition.auditionee_id == g.user.id %}
-                        Booked
-                    {% else %}
-                        {{ "Available" if audition.is_available() else "Unavailable" }}
-                    {% endif %}
-                </td>
-                <td>
-                    {% if audition.auditionee_id == g.user.id %}
-                        <a href="{{ url_for("cancel_audition", audition_id=audition.id) }}">Cancel Audition</a>
-                    {% elif audition.is_available() and not g.user.auditioning_for(show) %}
-                        <a href="{{ url_for("book_audition", audition_id=audition.id) }}">Book Audition</a>
-                    {% endif %}
+    {% for audition_day in show.audition_days if audition_day.auditions|length > 0 %}
+        <h2>{{ audition_day.get_date_string() }}</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>Availability</th>
+                    <th></th>
+                </tr>
+            </thead>
+            {% for audition in audition_day.auditions %}
+                <tr class="audition-slot{% if audition.auditionee_id == g.user.id %} success{% elif not audition.is_available() %} danger{% endif %}">
+                    <td style="width: 40%;">{{ audition.get_date_time_string() }}</td>
+                    <td style="width: 20%;">
+                        {% if audition.auditionee_id == g.user.id %}
+                            Booked
+                        {% else %}
+                            {{ "Available" if audition.is_available() else "Unavailable" }}
+                        {% endif %}
+                    </td>
+                    <td style="width: 40%;">
+                        {% if audition.auditionee_id == g.user.id %}
+                            <a href="{{ url_for("cancel_audition", audition_id=audition.id) }}">Cancel Audition</a>
+                        {% elif audition.is_available() and not g.user.auditioning_for(show) %}
+                            <a href="{{ url_for("book_audition", audition_id=audition.id) }}">Book Audition</a>
+                        {% endif %}
 
-                </td>
-            </tr>
-        {% endfor %}
-        {% if show.get_auditions()|length == 0 %}
-            <tr>
-                <td colspan="3" style="font-style: italic; text-align: center">Sorry, there are currently no auditions listed for this show.</td>
-            </tr>
-        {% endif %}
-    </table>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endfor %}
+    {% if show.get_auditions()|length == 0 %}
+            <p style="font-style: italic">Sorry, there are currently no auditions listed for this show.</p>
+    {% endif %}
+
 {% endblock %}
