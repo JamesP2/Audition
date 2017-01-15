@@ -4,6 +4,7 @@ from flask_oauthlib.client import OAuthException
 from audition import app, facebook, login_manager
 from audition.models import *
 from datetime import datetime
+from pprint import pprint
 
 
 @login_manager.user_loader
@@ -24,9 +25,11 @@ def login():
     user = User.query.filter_by(username=username).first()
 
     if user is None or not user.check_password(password):
+        app.logger.warn('Incorrect login for %s', user)
         flash('Username or Password incorrect', 'danger')
         return redirect(url_for('login'))
 
+    app.logger.info('%s Logging in', user)
     login_user(user, remember=remember_me)
 
     return redirect(request.args.get('next') or url_for('index'))
@@ -34,6 +37,7 @@ def login():
 
 @app.route('/logout')
 def logout():
+    app.logger.info('%s Logging out', current_user)
     logout_user()
     return redirect(url_for('index'))
 
@@ -54,14 +58,20 @@ def facebook_login():
 @app.route('/facebookAuthorized')
 def facebook_authorized():
     resp = facebook.authorized_response()
+    app.logger.debug('Response from facebook: ' + pprint(resp))
 
     if resp is None:
+        app.logger.warn('Access denied for facebook login. reason=%s error=%s' %
+                        (request.args['error_reason'],
+                         request.args['error_description']))
+
         return 'Access denied: reason=%s error=%s' % (
             request.args['error_reason'],
             request.args['error_description']
         )
 
     if isinstance(resp, OAuthException):
+        app.logger.error(OAuthException)
         return 'Access denied: %s' % resp.message
 
     session['oauth_token'] = (resp['access_token'], '')
@@ -72,6 +82,7 @@ def facebook_authorized():
     provider = UserProvider.query.filter_by(user_uid=me.data['id'], provider_id='facebook').first()
 
     if provider is not None and provider.user is not None:
+        app.logger.info('%s Logging in via Facebook', provider.user)
         login_user(provider.user)
 
     else:
@@ -89,6 +100,7 @@ def facebook_authorized():
         db.session.add(new_user)
         db.session.commit()
 
+        app.logger.info('%s Logging in via Facebook (new user)', new_user)
         login_user(new_user)
 
     return redirect(request.args.get('next') or url_for('index'))
@@ -167,6 +179,8 @@ def manage_show_description(show_id):
         db.session.add(given_show)
         db.session.commit()
 
+        app.logger.info('%s description changed by %s', given_show, current_user)
+
         return redirect(url_for('manage_show', show_id=show_id))
 
     return render_template('manage_show_description.html', show=given_show)
@@ -183,6 +197,8 @@ def manage_day_description(show_id, date):
         db.session.add(given_day)
         db.session.commit()
 
+        app.logger.info('%s description changed by %s', given_day, current_user)
+
         return redirect(url_for('manage_show', show_id=show_id))
 
     return render_template('manage_day_description.html', audition_day=given_day)
@@ -198,10 +214,12 @@ def manage_audition(audition_id):
         return redirect(url_for('index'))
 
     if audition.auditionee is None:
+        app.logger.warn('%i requested but no auditionee', audition_id)
         flash('Audition is not booked by anyone', 'danger')
         return redirect(url_for('index'))
 
     if audition.auditionee != current_user and current_user not in audition.get_show().managers:
+        app.logger.warn('%s does not have permission to view %s', current_user, audition)
         flash('You do not have permission to view this audition', 'danger')
         return redirect(url_for('index'))
 
@@ -212,6 +230,7 @@ def manage_audition(audition_id):
         db.session.add(comment)
         db.session.commit()
 
+        app.logger.info('%s posted new comment on %s', current_user, audition)
         return redirect(url_for('manage_audition', audition_id=audition_id))
 
     return render_template('audition.html' if current_user in audition.get_show().managers else 'my_audition.html',
@@ -229,6 +248,7 @@ def toggle_comment_viewable(comment_id):
         return redirect(url_for('index'))
 
     if current_user not in comment.audition.get_show().managers:
+        app.logger.warn('%s does not have permission to toggle view status for %s', current_user, comment)
         flash('You do not have permission to edit this comment', 'danger')
         return redirect(url_for('index'))
 
@@ -236,6 +256,8 @@ def toggle_comment_viewable(comment_id):
 
     db.session.add(comment)
     db.session.commit()
+
+    app.logger.warn('%s toggled view status for %s', current_user, comment)
 
     return redirect(url_for('manage_audition', audition_id=comment.audition_id))
 
@@ -256,6 +278,8 @@ def book_audition(audition_id):
     audition.auditionee = current_user
     db.session.add(audition)
     db.session.commit()
+
+    app.logger.info('%s booked audition %s', current_user, audition)
 
     flash('Your audition has been booked. We look forward to seeing you soon', 'success')
     return redirect(url_for('my_auditions'))
@@ -281,6 +305,8 @@ def cancel_audition(audition_id):
 
     db.session.add(audition)
     db.session.commit()
+
+    app.logger.info('%s cancelled audition %s', current_user, audition)
 
     flash('Your audition has been cancelled.', 'info')
     return redirect(url_for('my_auditions'))

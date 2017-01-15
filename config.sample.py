@@ -1,3 +1,5 @@
+import logging
+
 DEBUG = True
 TESTING = False
 
@@ -16,4 +18,6 @@ FACEBOOK_APP_SECRET = 'SECRET'
 
 OAUTH2_PROVIDER_TOKEN_EXPIRES_IN = 120
 
-
+LOG_ENABLED = True
+LOG_LEVEL = logging.INFO
+LOG_FILE = 'audition.log'

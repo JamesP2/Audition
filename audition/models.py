@@ -70,6 +70,9 @@ class User(db.Model):
 
         return False
 
+    def __str__(self):
+        return 'User %i (%s)' % (self.id, self.username)
+
 
 class UserProvider(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
@@ -115,6 +118,9 @@ class Show(db.Model):
             if day.date == date:
                 return True
 
+    def __str__(self):
+        return 'Show %i (%s)' % (self.id, self.name)
+
 
 class AuditionDay(db.Model):
     date = db.Column(db.Date, primary_key=True)
@@ -131,6 +137,9 @@ class AuditionDay(db.Model):
     def get_short_date_string(self):
         """ Get date string in the form of DD/MM/YY """
         return self.date.strftime('%d/%m/%y')
+
+    def __str__(self):
+        return 'Audition Day %s for %s' % (self.date, self.show)
 
 
 class Audition(db.Model):
@@ -194,12 +203,11 @@ class Audition(db.Model):
         return False
 
     def __repr__(self):
-        return 'audition %s' % str(self.id)
+        return 'audition %i' % self.id
 
     def __str__(self):
-        return 'Audition %s - %s (%s)' \
-               % (str(self.start_time), str(self.end_time),
-                  'Available' if self.is_available() else 'Unavailable')
+        return 'Audition %i (%s-%s)' \
+               % (self.id, str(self.start_time), str(self.end_time))
 
 
 class Comment(db.Model):
@@ -229,3 +237,9 @@ class Comment(db.Model):
 
     def get_time_string(self):
         return self.time.strftime('%H:%M')
+
+    def __repr__(self):
+        return 'comment %i' % self.id
+
+    def __str__(self):
+        return 'Comment %i' % self.id

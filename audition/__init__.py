@@ -2,6 +2,8 @@ from flask import Flask
 from flask_login import LoginManager
 from flask_oauthlib.client import OAuth
 from flaskext.markdown import Markdown
+import logging
+from logging.handlers import RotatingFileHandler
 
 app = Flask(__name__)
 app.config.from_pyfile('../config.py')
@@ -23,5 +25,13 @@ facebook = oauth.remote_app('facebook',
                             consumer_secret=app.config['FACEBOOK_APP_SECRET'],
                             request_token_params={'scope': 'email'}
 )
+
+if app.config['LOG_ENABLED']:
+    formatter = logging.Formatter('[%(asctime)s] %(levelname)s - %(funcName)s - %(message)s')
+    handler = RotatingFileHandler(app.config['LOG_FILE'], maxBytes=1000000, backupCount=2)
+    handler.setLevel(app.config['LOG_LEVEL'])
+    handler.setFormatter(formatter)
+    app.logger.addHandler(handler)
+    app.logger.info('Application started')
 
 import audition.views
