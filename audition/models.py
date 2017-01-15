@@ -85,6 +85,8 @@ class Show(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
 
+    description = db.Column(db.String(4000))
+
     def get_audition_dates_string(self):
         """ Get a string of all the dates that the show is running auditions for """
         if len(self.audition_days) == 0:
@@ -119,6 +121,8 @@ class AuditionDay(db.Model):
     show_id = db.Column(db.Integer, db.ForeignKey('show.id'), primary_key=True)
 
     show = db.relationship('Show', backref='audition_days')
+
+    description = db.Column(db.String(4000))
 
     def get_date_string(self):
         """ Get date string in the form of Day D Month Year """
