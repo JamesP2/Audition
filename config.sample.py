@@ -1,9 +1,8 @@
 DEBUG = True
 TESTING = False
 
+# Setting this to False will stop Facebook users from logging in and display a landing page to anonymous users
 SITE_ENABLED = True
-
-# SERVER_NAME = 'localhost'
 
 # Be sure to install pymysql if you intend to use this as written in this example
 SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://auditionslot:auditionslot@127.0.0.1:3306/auditionslot'
