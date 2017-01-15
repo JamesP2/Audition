@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block title %}Edit Description{% endblock %}
+{% block body %}
+    <h1>Edit Description for {{ show.name }}</h1>
+    <p>Write the description below. Standard Markdown syntax is supported.</p>
+
+    <form action="" method="post" id="descriptionForm">
+        <div class="form-group">
+            <textarea class="form-control" rows="3" placeholder="Show Description" name="description" form="descriptionForm">{{ show.description if show.description}}</textarea>
+        </div>
+        <button type="submit" class="btn">Save</button>
+    </form>
+{% endblock %}

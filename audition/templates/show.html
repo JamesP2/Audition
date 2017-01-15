@@ -2,6 +2,7 @@
 {% block title %}{{ show.name }}{% endblock %}
 {% block body %}
     <h1>Auditions for {{ show.name }}</h1>
+    {{ show.description | markdown | safe if show.description}}
     <p>Please pick a vacant audition</p>
     {% for audition_day in show.audition_days if audition_day.auditions|length > 0 %}
         <h2>{{ audition_day.get_date_string() }}</h2>

@@ -2,6 +2,8 @@
 {% block title %}Manage Show{% endblock %}
 {% block body %}
     <h1>Manage {{ show.name }}</h1>
+    {{ show.description | markdown | safe if show.description}}
+    <p class="small"><a href="{{ url_for('manage_show_description', show_id=show.id) }}">Edit Show Description</a></p>
     <p>Here you can view the full audition schedule for your show.</p>
 
     {% for audition_day in show.audition_days if audition_day.auditions|length > 0 %}

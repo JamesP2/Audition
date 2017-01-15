@@ -156,6 +156,22 @@ def manage_show(show_id):
                            show=given_show)
 
 
+@app.route('/show/<int:show_id>/manage/description', methods=['GET', 'POST'])
+@login_required
+def manage_show_description(show_id):
+    given_show = Show.query.get(show_id)
+
+    if request.method == 'POST':
+        given_show.description = request.form['description']
+
+        db.session.add(given_show)
+        db.session.commit()
+
+        return redirect(url_for('manage_show', show_id=show_id))
+
+    return render_template('manage_show_description.html', show=given_show)
+
+
 @app.route('/audition/<int:audition_id>', methods=['GET', 'POST'])
 @login_required
 def manage_audition(audition_id):
