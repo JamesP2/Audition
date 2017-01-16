@@ -34,7 +34,6 @@
             </div>
         </div>
     </nav>
-
     <div class="container">
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -46,12 +45,7 @@
             {% endfor %}
         {% endif %}
     {% endwith %}
-
-
-
     {% block body %}{% endblock %}
-
-
     <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.1.1.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
     </div>
