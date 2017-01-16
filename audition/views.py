@@ -93,8 +93,9 @@ def facebook_authorized():
             count += 1
 
         new_user = User(first_name=me.data['first_name'], last_name=me.data['last_name'], username=new_username,
-                        email=me.data['email'])
-        new_user.providers.append(UserProvider(user_uid=me.data['id'], provider_id='facebook', email=me.data['email']))
+                        email=me.data['email'] if 'email' in me.data.keys() else '')
+        new_user.providers.append(UserProvider(user_uid=me.data['id'], provider_id='facebook',
+                                               email=me.data['email'] if 'email' in me.data.keys() else ''))
 
         db.session.add(new_user)
         db.session.commit()
