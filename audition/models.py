@@ -20,8 +20,7 @@ class User(db.Model):
     password = db.Column(db.String(80))
     email = db.Column(db.String(200))
 
-    managed_shows = db.relationship('Show', secondary=show_managers,
-                                    backref='managers')
+    managed_shows = db.relationship('Show', secondary=show_managers, backref='managers')
 
     def is_authenticated(self):
         """ Is the user authenticated? (always true since any user object is authed) """
@@ -78,7 +77,7 @@ class UserProvider(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
     provider_id = db.Column(db.String(20), primary_key=True)
 
-    user = db.relationship('User', backref='providers')
+    user = db.relationship('User', backref='providers', cascade='delete')
     email = db.Column(db.String(200))
 
     user_uid = db.Column(db.String(200))

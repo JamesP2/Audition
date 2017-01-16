@@ -4,7 +4,6 @@ from flask_oauthlib.client import OAuthException
 from audition import app, facebook, login_manager
 from audition.models import *
 from datetime import datetime
-from pprint import pprint
 
 
 @login_manager.user_loader
@@ -58,7 +57,7 @@ def facebook_login():
 @app.route('/facebookAuthorized')
 def facebook_authorized():
     resp = facebook.authorized_response()
-    app.logger.debug('Response from facebook: ' + pprint(resp))
+    app.logger.debug('Response from facebook: %s',  resp)
 
     if resp is None:
         app.logger.warn('Access denied for facebook login. reason=%s error=%s' %
