@@ -29,8 +29,8 @@ facebook = oauth.remote_app('facebook',
 if app.config['LOG_ENABLED']:
     formatter = logging.Formatter('[%(asctime)s] %(levelname)s - %(funcName)s - %(message)s')
     handler = RotatingFileHandler(app.config['LOG_FILE'], maxBytes=1000000, backupCount=2)
-    handler.setLevel(app.config['LOG_LEVEL'])
     handler.setFormatter(formatter)
+    app.logger.setLevel(app.config['LOG_LEVEL'])
     app.logger.addHandler(handler)
     app.logger.info('Application started')
 
