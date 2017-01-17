@@ -279,7 +279,7 @@ def book_audition(audition_id):
     db.session.add(audition)
     db.session.commit()
 
-    app.logger.info('%s booked audition %s', current_user, audition)
+    app.logger.info('%s booked %s for %s', current_user, audition, audition.get_show())
 
     flash('Your audition has been booked. We look forward to seeing you soon', 'success')
     return redirect(url_for('my_auditions'))
@@ -306,7 +306,7 @@ def cancel_audition(audition_id):
     db.session.add(audition)
     db.session.commit()
 
-    app.logger.info('%s cancelled audition %s', current_user, audition)
+    app.logger.info('%s cancelled audition %s for %s', current_user, audition, audition.get_show())
 
     flash('Your audition has been cancelled.', 'info')
     return redirect(url_for('my_auditions'))
