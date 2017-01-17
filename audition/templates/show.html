@@ -18,15 +18,15 @@
             </thead>
             {% for audition in audition_day.auditions if not audition.in_past() %}
                 <tr class="audition-slot{% if audition.auditionee_id == g.user.id %} success{% elif not audition.is_available() %} danger{% endif %}">
-                    <td style="width: 40%;">{{ audition.get_date_time_string() }}</td>
-                    <td style="width: 20%;">
+                    <td style="width: 35%;">{{ audition.get_date_time_string() }}</td>
+                    <td style="width: 35%;">
                         {% if audition.auditionee_id == g.user.id %}
                             Booked
                         {% else %}
                             {{ "Available" if audition.is_available() else "Unavailable" }}
                         {% endif %}
                     </td>
-                    <td style="width: 40%;">
+                    <td style="width: 30%;">
                         {% if audition.auditionee_id == g.user.id %}
                             <a href="{{ url_for("cancel_audition", audition_id=audition.id) }}">Cancel Audition</a>
                         {% elif audition.is_available() and not g.user.auditioning_for(show) %}

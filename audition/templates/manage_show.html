@@ -20,13 +20,13 @@
             </thead>
             {% for audition in audition_day.auditions %}
                 <tr class="audition-slot{% if not audition.is_available() %} active{% endif %}">
-                    <td style="width: 40%;">
+                    <td style="width: 35%;">
                         {{ audition.get_date_time_string() }}
                     </td>
-                    <td style="width: 20%;">
+                    <td style="width: 35%;">
                         {{ "Not Booked" if audition.is_available() else "Booked By " + audition.auditionee.get_full_name() }}
                     </td>
-                    <td style="width: 40%;">
+                    <td style="width: 30%;">
                         {% if not audition.is_available() %}
                             <a href="{{ url_for("manage_audition", audition_id=audition.id) }}">More Info</a>
                         {% endif %}
