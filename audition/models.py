@@ -1,8 +1,6 @@
-import html, re
-
 from audition.database import db
+from datetime import datetime, time
 from hashlib import md5
-from urllib.parse import quote_plus
 from werkzeug.security import check_password_hash, generate_password_hash
 
 show_managers = db.Table('show_managers',
@@ -117,6 +115,14 @@ class Show(db.Model):
             if day.date == date:
                 return True
 
+    def audition_days_in_past(self):
+        """ Determine whether all the audition days are in the past """
+        for day in self.audition_days:
+            if not day.in_past():
+                return False
+
+        return True
+
     def __str__(self):
         return 'Show %i (%s)' % (self.id, self.name)
 
@@ -136,6 +142,18 @@ class AuditionDay(db.Model):
     def get_short_date_string(self):
         """ Get date string in the form of DD/MM/YY """
         return self.date.strftime('%d/%m/%y')
+
+    def in_past(self):
+        """ Determine whether this day is in the past"""
+        return self.date < datetime.now().date()
+
+    def auditions_in_past(self):
+        """ Determine whether all auditions for this day are in the past """
+        for audition in self.auditions:
+            if not audition.in_past():
+                return False
+
+        return True
 
     def __str__(self):
         return 'Audition Day %s for %s' % (self.date, self.show)
@@ -200,6 +218,10 @@ class Audition(db.Model):
                 return True
 
         return False
+
+    def in_past(self):
+        """ Determine whether this audition is in the past """
+        return datetime.combine(self.audition_day_date, self.start_time) < datetime.now()
 
     def __repr__(self):
         return 'audition %i' % self.id

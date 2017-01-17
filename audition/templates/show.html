@@ -2,9 +2,10 @@
 {% block title %}{{ show.name }}{% endblock %}
 {% block body %}
     <h1>Auditions for {{ show.name }}</h1>
+    <p>Audition times are shown below. Click "Book Audition" to book the selected slot.</p>
     {{ show.description | markdown | safe if show.description}}
-    <p>Please pick a vacant audition</p>
-    {% for audition_day in show.audition_days if audition_day.auditions|length > 0 %}
+    <hr />
+    {% for audition_day in show.audition_days if audition_day.auditions|length > 0 and not audition_day.in_past() %}
         <h2>{{ audition_day.get_date_string() }}</h2>
         {{ audition_day.description | markdown | safe if audition_day.description}}
         <table class="table">
@@ -15,7 +16,7 @@
                     <th></th>
                 </tr>
             </thead>
-            {% for audition in audition_day.auditions %}
+            {% for audition in audition_day.auditions if not audition.in_past() %}
                 <tr class="audition-slot{% if audition.auditionee_id == g.user.id %} success{% elif not audition.is_available() %} danger{% endif %}">
                     <td style="width: 40%;">{{ audition.get_date_time_string() }}</td>
                     <td style="width: 20%;">
@@ -34,9 +35,14 @@
                     </td>
                 </tr>
             {% endfor %}
+            {% if audition_day.auditions_in_past() %}
+                <tr>
+                    <td colspan="3" style="font-style: italic; text-align: center">Sorry, there are no slots for the remainder of this day.</td>
+                </tr>
+            {% endif %}
         </table>
     {% endfor %}
-    {% if show.get_auditions()|length == 0 %}
+    {% if show.audition_days_in_past() %}
             <p style="font-style: italic">Sorry, there are currently no auditions listed for this show.</p>
     {% endif %}
 
