@@ -57,7 +57,7 @@ def facebook_login():
 @app.route('/facebookAuthorized')
 def facebook_authorized():
     resp = facebook.authorized_response()
-    app.logger.debug('Response from facebook: %s',  resp)
+    app.logger.debug('Response from facebook: %s', resp)
 
     if resp is None:
         app.logger.warn('Access denied for facebook login. reason=%s error=%s' %
@@ -274,6 +274,23 @@ def book_audition(audition_id):
         return render_template('confirm_book.html',
                                show=audition.audition_day.show,
                                audition=audition)
+
+    # Don't let a user book an audition clashing with another one. Check every existing audition
+    for user_audition in current_user.auditions:
+        # If the days don't match then there's definitely no clash
+        if audition.audition_day.date != user_audition.audition_day.date:
+            continue
+
+        # Otherwise check for intersection.
+        # Credit to http://stackoverflow.com/questions/3721249/python-date-interval-intersection
+        if (audition.start_time <= user_audition.start_time <= audition.end_time) \
+                or (user_audition.start_time <= audition.start_time <= user_audition.end_time):
+
+            app.logger.info('%s attempted to book %s for %s but it clashed with %s for %s',
+                            current_user, audition, audition.get_show(), user_audition, user_audition.get_show())
+
+            flash('Cannot book the selected audition as it clashes with another.', 'warning')
+            return redirect(url_for('show', show_id=audition.audition_day_show_id))
 
     audition.auditionee = current_user
     db.session.add(audition)
