@@ -219,7 +219,7 @@ def manage_audition(audition_id):
         return redirect(url_for('index'))
 
     if audition.auditionee is None:
-        app.logger.warn('%s requested but no auditionee', audition)
+        app.logger.warn('%s requested %s but no auditionee', current_user, audition)
         flash('Audition is not booked by anyone', 'danger')
         return redirect(url_for('index'))
 
