@@ -213,14 +213,14 @@ def manage_audition(audition_id):
         flash('Audition not found', 'danger')
         return redirect(url_for('index'))
 
-    if audition.auditionee is None:
-        app.logger.warn('%i requested but no auditionee', audition_id)
-        flash('Audition is not booked by anyone', 'danger')
-        return redirect(url_for('index'))
-
     if audition.auditionee != current_user and current_user not in audition.get_show().managers:
         app.logger.warn('%s does not have permission to view %s', current_user, audition)
         flash('You do not have permission to view this audition', 'danger')
+        return redirect(url_for('index'))
+
+    if audition.auditionee is None:
+        app.logger.warn('%s requested but no auditionee', audition)
+        flash('Audition is not booked by anyone', 'danger')
         return redirect(url_for('index'))
 
     if request.method == 'POST':
