@@ -270,6 +270,16 @@ def book_audition(audition_id):
         flash('Audition not found', 'danger')
         return redirect(url_for('index'))
 
+    if audition.auditionee == current_user:
+        app.logger.warn('%s tried to book %s but already booked by self', current_user, audition)
+        flash('You have already booked this audition', 'warning')
+        return redirect(url_for('index'))
+
+    if audition.auditionee is not None:
+        app.logger.warn('%s tried to book %s but booked by someone else', current_user, audition)
+        flash('This audition is booked by someone else', 'warning')
+        return redirect(url_for('index'))
+
     if request.method == 'GET':
         return render_template('confirm_book.html',
                                show=audition.audition_day.show,
@@ -310,10 +320,25 @@ def cancel_audition(audition_id):
         flash('Audition not found', 'danger')
         return redirect(url_for('index'))
 
+    if audition.auditionee is None:
+        app.logger.warn('%s tried to cancel vacant %s', current_user, audition)
+        flash('Requested audition is not booked and so cannot be cancelled', 'warning')
+        return redirect(url_for('index'))
+
+    if current_user != audition.auditionee and current_user not in audition.get_show().managers:
+        app.logger.warn('%s tried to cancel %s but booked by someone else', current_user, audition)
+        flash('You do not have permission to cancel that audition', 'danger')
+        return redirect(url_for('index'))
+
     if request.method == 'GET':
         return render_template('confirm_cancel.html',
                                show=audition.audition_day.show,
                                audition=audition)
+
+    if audition.auditionee != current_user:
+        message = 'Audition cancelled'
+    else:
+        message = 'Your audition has been cancelled'
 
     audition.auditionee = None
 
@@ -325,5 +350,5 @@ def cancel_audition(audition_id):
 
     app.logger.info('%s cancelled audition %s for %s', current_user, audition, audition.get_show())
 
-    flash('Your audition has been cancelled.', 'info')
+    flash(message, 'info')
     return redirect(url_for('my_auditions'))
