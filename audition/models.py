@@ -231,8 +231,8 @@ class Audition(db.Model):
         return 'audition %i' % self.id
 
     def __str__(self):
-        return 'Audition %i (%s-%s)' \
-               % (self.id, str(self.start_time), str(self.end_time))
+        return 'Audition %i (%s)' \
+               % (self.id, self.get_date_time_string())
 
 
 class Comment(db.Model):
