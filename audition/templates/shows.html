@@ -11,11 +11,15 @@
                 <th></th>
             </tr>
         </thead>
-        {% for show in shows %}
+        {% for show in shows if not show.hidden or g.user in show.managers %}
             <tr>
-                <td>{{ show.name }}</td>
-                <td>{{ show.get_audition_dates_string() }}</td>
-                <td>
+                {% if show.hidden %}
+                    <td style="font-style: italic;">{{ show.name }} <strong>(hidden)</strong></td>
+                {% else %}
+                    <td>{{ show.name }}</td>
+                {% endif %}
+                <td style="{{ "font-style: italic;" if show.hidden }}">{{ show.get_audition_dates_string() }}</td>
+                <td style="{{ "font-style: italic;" if show.hidden }}">
                     {% if g.user in show.managers %}
                         <a href="{{ url_for('manage_show', show_id=show.id) }}">Manage Show</a>
                     {% else %}

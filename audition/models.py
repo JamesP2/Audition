@@ -89,6 +89,8 @@ class Show(db.Model):
 
     schedule_public = db.Column(db.Boolean(), default=False, nullable=False)
 
+    hidden = db.Column(db.Boolean(), default=False, nullable=False)
+
     def get_audition_dates_string(self):
         """ Get a string of all the dates that the show is running auditions for """
         if len(self.audition_days) == 0:
