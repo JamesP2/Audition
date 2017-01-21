@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_login import LoginManager
+from flask_mail import Mail
 from flask_oauthlib.client import OAuth
 from flaskext.markdown import Markdown
 import logging
@@ -13,6 +14,8 @@ markdown = Markdown(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+
+mail = Mail(app)
 
 oauth = OAuth()
 

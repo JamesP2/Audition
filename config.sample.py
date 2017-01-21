@@ -21,3 +21,13 @@ OAUTH2_PROVIDER_TOKEN_EXPIRES_IN = 120
 LOG_ENABLED = True
 LOG_LEVEL = logging.INFO
 LOG_FILE = 'audition.log'
+
+MAIL_SERVER = 'localhost'
+MAIL_PORT = 25
+MAIL_USE_TLS = False
+MAIL_USE_SSL = False
+MAIL_USERNAME = None
+MAIL_PASSWORD = None
+
+MAIL_FROM = 'yourmail@example.com'
+MAIL_BCC = None
