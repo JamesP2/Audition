@@ -1,6 +1,7 @@
 from audition.database import db
 from datetime import datetime, time
 from hashlib import md5
+from validate_email import validate_email
 from werkzeug.security import check_password_hash, generate_password_hash
 
 show_managers = db.Table('show_managers',
@@ -126,6 +127,15 @@ class Show(db.Model):
                 return False
 
         return True
+
+    def get_manager_emails(self):
+        emails = []
+
+        for manager in self.managers:
+            if manager.email is not None:
+                emails.append(manager.email)
+
+        return emails
 
     def __str__(self):
         return 'Show %i (%s)' % (self.id, self.name)
