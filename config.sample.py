@@ -33,3 +33,5 @@ MAIL_PASSWORD = None
 
 MAIL_FROM = ('Your Name', 'yourmail@example.com')
 MAIL_BCC = None
+
+WARN_EMAIL = True

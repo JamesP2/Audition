@@ -1,11 +1,13 @@
-from flask import g, render_template, request, session, flash, redirect, url_for
-from flask_login import login_required, current_user, login_user, logout_user
-from flask_mail import Message
-from flask_oauthlib.client import OAuthException
 from audition import app, facebook, login_manager
 from audition.email import send_mail
 from audition.models import *
 from datetime import datetime
+from flask import g, render_template, request, session, flash, redirect, url_for
+from flask_login import login_required, current_user, login_user, logout_user
+from flask_mail import Message
+from flask_oauthlib.client import OAuthException
+from markupsafe import Markup
+
 
 
 @login_manager.user_loader
@@ -116,6 +118,14 @@ def get_facebook_oauth_token():
 @app.before_request
 def before_request():
     g.user = current_user
+
+    if 'WARN_EMAIL' in app.config and app.config['WARN_EMAIL'] \
+            and current_user.is_authenticated and request.endpoint != 'edit_profile':
+        if not validate_email(current_user.email):
+            flash(Markup('You do not have a valid email address configured for your profile <br>' +
+                         'It is <strong>highly recommended</strong> that you have one on file so we can submit ' +
+                         'audition feedback to you.<br><a href="' + url_for('edit_profile', user_id=current_user.id) +
+                         '">Click here to edit your information</a>'), 'warning')
 
 
 @app.route('/')
