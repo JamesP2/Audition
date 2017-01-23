@@ -303,8 +303,6 @@ def toggle_comment_viewable(comment_id):
     db.session.add(comment)
     db.session.commit()
 
-    app.logger.info('%s toggled view status for %s', current_user, comment)
-
     return redirect(url_for('manage_audition', audition_id=comment.audition_id))
 
 
