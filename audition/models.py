@@ -56,7 +56,7 @@ class User(db.Model):
                 if provider.provider_id == 'facebook':
                     return 'http://graph.facebook.com/' + provider.user_uid + '/picture'
 
-        email = self.email if self.email is not None else ''
+        email = self.email if self.has_valid_email() else ''
 
         return 'https://www.gravatar.com/avatar/' + md5(str.encode(email)).hexdigest() + '?d=retro'
 
@@ -67,6 +67,9 @@ class User(db.Model):
                 return True
 
         return False
+
+    def has_valid_email(self):
+        return self.email is not None and validate_email(self.email)
 
     def __str__(self):
         return 'User %i (%s)' % (self.id, self.username)
