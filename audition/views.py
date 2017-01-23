@@ -1,7 +1,9 @@
 from flask import g, render_template, request, session, flash, redirect, url_for
 from flask_login import login_required, current_user, login_user, logout_user
+from flask_mail import Message
 from flask_oauthlib.client import OAuthException
 from audition import app, facebook, login_manager
+from audition.email import send_mail
 from audition.models import *
 from datetime import datetime
 
@@ -252,12 +254,23 @@ def toggle_comment_viewable(comment_id):
         flash('You do not have permission to edit this comment', 'danger')
         return redirect(url_for('index'))
 
-    comment.viewable_by_auditionee = not comment.viewable_by_auditionee
+    if not comment.viewable_by_auditionee:
+        comment.viewable_by_auditionee = True
+        app.logger.info('%s made %s visible to %s', current_user, comment, comment.audition.auditionee)
+
+        if comment.audition.auditionee.has_valid_email():
+            message = Message('You have new audition feedback', recipients=[comment.audition.auditionee.email],
+                              html=render_template('email/audition_feedback_posted.html', comment=comment))
+            send_mail(message)
+
+    else:
+        comment.viewable_by_auditionee = False
+        app.logger.info('%s hid %s from %s', current_user, comment, comment.audition.auditionee)
 
     db.session.add(comment)
     db.session.commit()
 
-    app.logger.warn('%s toggled view status for %s', current_user, comment)
+    app.logger.info('%s toggled view status for %s', current_user, comment)
 
     return redirect(url_for('manage_audition', audition_id=comment.audition_id))
 
