@@ -426,10 +426,12 @@ def view_profile(user_id):
 
     if user is None:
         flash('The requested user does not exist', 'danger')
+        app.logger.warn('%s tried to view profile for user ID %s but it does not exist', current_user, user_id)
         return redirect(url_for('index'))
 
     if user.id != current_user.id:
-        flash('You do not have permission to view that user\'s profile.')
+        flash('You do not have permission to view that user\'s profile.', 'danger')
+        app.logger.warn('%s tried to view profile for %s but does not have permission', current_user, user)
         return redirect(url_for('index'))
 
     return render_template('profile.html', user=user)
@@ -441,11 +443,13 @@ def edit_profile(user_id):
     user = User.query.get(user_id)
 
     if user is None:
-        flash('The requested user does not exist')
+        flash('The requested user does not exist', 'danger')
+        app.logger.warn('%s tried to edit profile for user ID %s but it does not exist', current_user, user_id)
         return redirect(url_for('index'))
 
     if user.id != current_user.id:
-        flash('You do not have permission to edit that user\'s profile.')
+        flash('You do not have permission to edit that user\'s profile.', 'danger')
+        app.logger.warn('%s tried to edit profile for %s but does not have permission', current_user, user)
         return redirect(url_for('index'))
 
     if request.method == 'POST':
@@ -463,6 +467,8 @@ def edit_profile(user_id):
 
         db.session.add(user)
         db.session.commit()
+
+        app.logger.info('%s edited profile for %s', current_user, user)
 
         flash('Changes saved', 'success')
         return redirect(url_for('view_profile', user_id=user_id))
