@@ -1,0 +1,66 @@
+{% extends "popup/layout.html" %}
+{% block title %}Markdown Guide{% endblock %}
+{% block body %}
+    <h1>Markdown Help</h1>
+    <p>Markdown is an easy to read and write formatting system that allows you to format text in text fields on this
+        site.</p>
+    <p>Examples are below</p>
+    <h2>Text Decoration</h2>
+    <p>Easily embolden or italicise text:</p>
+    <pre>
+**Bold Text**
+*Italic Text*</pre>
+    <p>Output:</p>
+    {% filter markdown %}
+**Bold Text**
+
+*Italic Text*
+    {% endfilter %}
+    <h2>New Lines</h2>
+    <p>Make sure you leave a <strong>blank</strong> line before text that you want to put on a new line.</p>
+    <pre>
+Line One
+
+Line Two</pre>
+    <p>Output:</p>
+    {% filter markdown %}
+Line One
+
+Line Two
+    {% endfilter %}
+    <h2>Headers</h2>
+    <p>Underline lines to make them headers:</p>
+    <pre>
+Top Level Header
+================
+Sub Level Header
+----------------</pre>
+    <p>Output:</p>
+    {% filter markdown %}
+Top Level Header
+================
+Sub Level Header
+----------------
+    {% endfilter %}
+    <h2>Lists</h2>
+    <p>Lists are easy! And can be ordered or unordered:</p>
+    <pre>
+- Unordered Item 1
+- Unordered Item 2
+- Unordered Item 3
+
+1. Ordered Item 1
+2. Ordered Item 2
+3. Ordered Item 3</pre>
+    {% filter markdown %}
+- Unordered Item 1
+- Unordered Item 2
+- Unordered Item 3
+    {% endfilter %}
+    {% filter markdown %}
+1. Ordered Item 1
+2. Ordered Item 2
+3. Ordered Item 3
+    {% endfilter %}
+{% endblock %}
+
