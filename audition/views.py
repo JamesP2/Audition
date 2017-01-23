@@ -226,6 +226,10 @@ def manage_audition(audition_id):
         return redirect(url_for('index'))
 
     if request.method == 'POST':
+        if request.form['comment_text'] == '':
+            flash('Your comment cannot be empty!', 'warning')
+            return redirect(url_for('manage_audition', audition_id=audition_id))
+
         comment = Comment(time=datetime.now(), audition=audition, user=current_user,
                           comment_body=request.form['comment_text'])
 
@@ -238,6 +242,35 @@ def manage_audition(audition_id):
     return render_template('audition.html' if current_user in audition.get_show().managers else 'my_audition.html',
                            show=audition.get_show(),
                            audition=audition)
+
+
+@app.route('/audition/<int:audition_id>/comment/<int:comment_id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_comment(audition_id, comment_id):
+    comment = Comment.query.get(comment_id)
+
+    if comment.audition_id != audition_id:
+        flash('Comment belongs to another audition', 'danger')
+        return redirect(url_for('index'))
+
+    if request.method == 'POST':
+        if request.form['comment_text'] == '':
+            flash('Your comment cannot be empty!', 'warning')
+            return redirect(url_for('manage_audition', audition_id=audition_id))
+
+        comment.comment_body = request.form['comment_text']
+        comment.edits += 1
+
+        comment.last_edit_time = datetime.now()
+
+        db.session.add(comment)
+        db.session.commit()
+
+        app.logger.info('%s edited by %s', comment, current_user)
+
+        return redirect(url_for('manage_audition', audition_id=audition_id))
+
+    return render_template('edit_comment.html', comment=comment)
 
 
 @app.route('/comment/<int:comment_id>/toggle_viewable')
@@ -365,3 +398,8 @@ def cancel_audition(audition_id):
 
     flash(message, 'info')
     return redirect(url_for('my_auditions'))
+
+
+@app.route('/help/markdown')
+def markdown_help():
+    return render_template('popup/markdown_help.html')

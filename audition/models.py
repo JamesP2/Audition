@@ -270,11 +270,11 @@ class Comment(db.Model):
         'order_by': time
     }
 
-    def get_date_string(self):
-        return self.time.strftime('%d/%m/%y')
+    def get_submission_datetime_string(self):
+        return self.time.strftime('%d/%m/%y %H:%M')
 
-    def get_time_string(self):
-        return self.time.strftime('%H:%M')
+    def get_last_edit_datetime_string(self):
+        return self.last_edit_time.strftime('%d/%m/%y %H:%M')
 
     def __repr__(self):
         return 'comment %i' % self.id

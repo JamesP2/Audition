@@ -28,11 +28,19 @@
                         <h4 class="media-heading">
                             {{ comment.user.get_full_name() }}
                             <small>
-                                {{ comment.get_date_string() }} {{ comment.get_time_string() }}
+                                {{ comment.get_submission_datetime_string() }}
+                                {% if comment.edits > 0 %}
+                                    (Edited on {{ comment.get_last_edit_datetime_string() }})
+                                {% endif %}
                                 {% if comment.viewable_by_auditionee %}
                                     <span style="font-style: italic; font-weight: bold; color: darkred">
                                         This comment is viewable by the auditionee
                                     </span>
+                                {% endif %}
+                                {% if g.user == comment.user %}
+                                    <a href="{{ url_for('edit_comment', comment_id=comment.id, audition_id=comment.audition.id) }}">
+                                         Edit Comment
+                                    </a>
                                 {% endif %}
                             </small>
                         </h4>
@@ -43,7 +51,8 @@
                             {% if comment.viewable_by_auditionee %}
                                 <a href="{{ url_for('toggle_comment_viewable', comment_id=comment.id) }}">Hide From Auditionee</a>
                             {% else %}
-                                <a href="{{ url_for('toggle_comment_viewable', comment_id=comment.id) }}">Show To Auditionee</a>
+                                <a href="{{ url_for('toggle_comment_viewable', comment_id=comment.id) }}"
+                                   onclick="return window.confirm('Click OK to show this comment to the auditionee.\nNote: This will email them to tell them you have left feedback!')">Show To Auditionee</a>
                             {% endif %}
                         </p>
                     </div>
@@ -57,6 +66,11 @@
     </a>
 
     <div id="commentPoster" style="display: none;">
+    <p>
+        Standard Markdown syntax is supported for headings/text decoration/lists and more.
+        Click <a href="{{ url_for('markdown_help') }}" onClick="return popup(this, 'Markdown Help', 500, 500)">here</a>
+        for more info.
+    </p>
         <div class="media">
         <div class="media-left media-top">
             <a href="#">

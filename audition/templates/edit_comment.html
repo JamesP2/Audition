@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block title %}Edit Description{% endblock %}
+{% block body %}
+    <h1>Edit Comment</h1>
+    <p>
+        Standard Markdown syntax is supported for headings/text decoration/lists and more.
+        Click <a href="{{ url_for('markdown_help') }}" onClick="return popup(this, 'Markdown Help', 500, 500)">here</a>
+        for more info.
+    </p>
+    <div class="media">
+        <div class="media-left media-top">
+            <a href="#">
+                <img class="media-object avatar" src="{{ comment.user.get_avatar_url() }}" alt="...">
+            </a>
+        </div>
+        <div class="media-body">
+            <form action="" method="post" id="commentForm">
+                <div class="form-group">
+                    <textarea class="form-control" rows="6" placeholder="Type your comment here" name="comment_text"
+                              form="commentForm">{{ comment.comment_body }}</textarea>
+                </div>
+                <button type="submit" class="btn">Save</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

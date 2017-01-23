@@ -2,11 +2,14 @@
 {% block title %}Edit Description{% endblock %}
 {% block body %}
     <h1>Edit Description for {{ show.name }}</h1>
-    <p>Write the description below. Standard Markdown syntax is supported.</p>
+    <p>
+        Write the description below. Standard Markdown syntax is supported.
+        Click <a href="{{ url_for('markdown_help') }}" onClick="return popup(this, 'Markdown Help', 500, 500)">here</a> for more info.
+    </p>
 
     <form action="" method="post" id="descriptionForm">
         <div class="form-group">
-            <textarea class="form-control" rows="3" placeholder="Show Description" name="description" form="descriptionForm">{{ show.description if show.description}}</textarea>
+            <textarea class="form-control" rows="10" placeholder="Show Description" name="description" form="descriptionForm">{{ show.description if show.description}}</textarea>
         </div>
         <button type="submit" class="btn">Save</button>
     </form>
