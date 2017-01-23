@@ -10,7 +10,12 @@
         </div>
         <div class="media-body">
             <h4 class="media-heading">{{ audition.audition_day.get_date_string() }} at {{ audition.get_start_time_string() }} until {{ audition.get_end_time_string() }}</h4>
-            {{ audition.auditionee.get_full_name() }}
+            {{ audition.auditionee.get_full_name() }}<br>
+            {% if audition.auditionee.email %}
+                {{ auditionee.email }}
+            {% else %}
+                <span style="font-weight: bold; color: darkred">Auditionee has no email address on their profile. Please encourage them to add it!</span>
+            {% endif %}
         </div>
     </div>
     <h2>Comments</h2>
