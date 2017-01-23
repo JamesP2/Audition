@@ -120,7 +120,7 @@ def before_request():
     g.user = current_user
 
     if 'WARN_EMAIL' in app.config and app.config['WARN_EMAIL'] \
-            and current_user.is_authenticated and request.endpoint != 'edit_profile':
+            and current_user.is_authenticated and request.endpoint not in ['edit_profile', 'logout']:
         if not validate_email(current_user.email):
             flash(Markup('You do not have a valid email address configured for your profile <br>' +
                          'It is <strong>highly recommended</strong> that you have one on file so we can submit ' +
