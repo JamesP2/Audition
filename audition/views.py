@@ -35,6 +35,9 @@ def login():
     app.logger.info('%s Logging in', user)
     login_user(user, remember=remember_me)
 
+    if 'WARN_EMAIL' in app.config and app.config['WARN_EMAIL'] and not validate_email(user.email):
+        app.logger.info('%s has no valid email. They will be warned until it is changed.', user)
+
     return redirect(request.args.get('next') or url_for('index'))
 
 
@@ -106,6 +109,9 @@ def facebook_authorized():
 
         app.logger.info('%s Logging in via Facebook (new user)', new_user)
         login_user(new_user)
+
+    if 'WARN_EMAIL' in app.config and app.config['WARN_EMAIL'] and not validate_email(current_user.email):
+        app.logger.info('%s has no valid email. They will be warned until it is changed.', current_user)
 
     return redirect(request.args.get('next') or url_for('index'))
 
