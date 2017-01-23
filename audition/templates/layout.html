@@ -24,7 +24,7 @@
                     <li><a href="{{ url_for('my_auditions') }}">My Auditions</a></li>
                 </ul>
                 <p class="navbar-text navbar-right">
-                    Signed in as {{ g.user.first_name }} {{ g.user.last_name }}.
+                    Signed in as <a href="{{ url_for('profile') }}" class="navbar-link">{{ g.user.first_name }} {{ g.user.last_name }}</a>.
                     <a href="{{ url_for('logout') }}" class="navbar-link">Sign Out</a>
                 </p>
                 {% else %}

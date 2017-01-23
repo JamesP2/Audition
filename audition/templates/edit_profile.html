@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+{% block title %}Edit Profile{% endblock %}
+{% block body %}
+    <h1>Edit Profile</h1>
+    {% if g.user == user %}
+        <p>
+            Your profile is below. It is important to ensure that all information is up to date so audition panels
+            have all the correct information about you.
+        </p>
+        <p>
+            It is <strong>especially important</strong> that your email is up to date or you will <strong>not</strong>
+            receive audition feedback!
+        </p>
+    {% endif %}
+    <form class="form-horizontal" action="" method="post">
+        <div class="form-group">
+            <label for="email" class="col-sm-3 control-label">Email</label>
+            <div class="col-sm-6">
+                <input type="email" class="form-control" id="email" name="email" placeholder="Email" value="{{ user.email }}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="first_name" class="col-sm-3 control-label">First Name</label>
+            <div class="col-sm-6">
+                <input type="text" class="form-control" id="first_name" name="first_name" placeholder="First Name" value="{{ user.first_name }}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="last_name" class="col-sm-3 control-label">Last Name</label>
+            <div class="col-sm-6">
+                <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Last Name" value="{{ user.last_name }}">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-6">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <a href="{{ url_for('profile', user_id=user.id) }}" class="btn btn-default">Back to Profile</a>
+            </div>
+        </div>
+    </form>
+{% endblock %}

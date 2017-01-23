@@ -399,5 +399,62 @@ def cancel_audition(audition_id):
 
 
 @app.route('/help/markdown')
+@login_required
 def markdown_help():
     return render_template('popup/markdown_help.html')
+
+
+@app.route('/profile')
+def profile():
+    return redirect(url_for('view_profile', user_id=current_user.id))
+
+
+@app.route('/profile/<int:user_id>')
+@login_required
+def view_profile(user_id):
+    user = User.query.get(user_id)
+
+    if user is None:
+        flash('The requested user does not exist', 'danger')
+        return redirect(url_for('index'))
+
+    if user.id != current_user.id:
+        flash('You do not have permission to view that user\'s profile.')
+        return redirect(url_for('index'))
+
+    return render_template('profile.html', user=user)
+
+
+@app.route('/profile/<int:user_id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_profile(user_id):
+    user = User.query.get(user_id)
+
+    if user is None:
+        flash('The requested user does not exist')
+        return redirect(url_for('index'))
+
+    if user.id != current_user.id:
+        flash('You do not have permission to edit that user\'s profile.')
+        return redirect(url_for('index'))
+
+    if request.method == 'POST':
+        if request.form['first_name'] == '' or request.form['last_name'] == '' or request.form['email'] == '':
+            flash('Please fill out all fields')
+            return redirect(url_for('edit_profile', user_id=user_id))
+
+        if not validate_email(request.form['email']):
+            flash('Please provide a valid email address', 'warning')
+            return redirect(url_for('edit_profile', user_id=user_id))
+
+        user.email = request.form['email']
+        user.first_name = request.form['first_name']
+        user.last_name = request.form['last_name']
+
+        db.session.add(user)
+        db.session.commit()
+
+        flash('Changes saved', 'success')
+        return redirect(url_for('view_profile', user_id=user_id))
+
+    return render_template('edit_profile.html', user=user)
