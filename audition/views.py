@@ -2,11 +2,13 @@ from audition import app, facebook, login_manager
 from audition.email import send_mail
 from audition.models import *
 from datetime import datetime
-from flask import g, render_template, request, session, flash, redirect, url_for
+from flask import abort, g, render_template, render_template_string, request, session, flash, redirect, url_for
 from flask_login import login_required, current_user, login_user, logout_user
 from flask_mail import Message
 from flask_oauthlib.client import OAuthException
+import glob
 from markupsafe import Markup
+import os.path
 
 
 @login_manager.user_loader
@@ -254,9 +256,11 @@ def manage_audition(audition_id):
         app.logger.info('%s posted new comment on %s', current_user, audition)
         return redirect(url_for('manage_audition', audition_id=audition_id))
 
+    template_files = [os.path.basename(file)[:-3] for file in glob.glob('comment_template/*.md')]
+
     return render_template('audition.html' if current_user in audition.get_show().managers else 'my_audition.html',
                            show=audition.get_show(),
-                           audition=audition)
+                           audition=audition, template_files=template_files)
 
 
 @app.route('/audition/<int:audition_id>/comment/<int:comment_id>/edit', methods=['GET', 'POST'])
@@ -319,6 +323,20 @@ def toggle_comment_viewable(comment_id):
     db.session.commit()
 
     return redirect(url_for('manage_audition', audition_id=comment.audition_id))
+
+
+@app.route('/audition/<int:audition_id>/comment/template/<string:template_filename>')
+@login_required
+def get_comment_template(audition_id, template_filename):
+    audition = Audition.query.get(audition_id)
+    if audition is None:
+        abort(404)
+
+    if not os.path.isfile('comment_template/' + template_filename + '.md'):
+        abort(404)
+
+    with open('comment_template/' + template_filename + '.md') as template_file:
+        return render_template_string(template_file.read(), audition=audition)
 
 
 @app.route('/audition/<int:audition_id>/book', methods=['GET', 'POST'])
