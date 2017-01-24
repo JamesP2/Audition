@@ -71,11 +71,23 @@
     </a>
 
     <div id="commentPoster" style="display: none;">
-    <p>
-        Standard Markdown syntax is supported for headings/text decoration/lists and more.
-        Click <a href="{{ url_for('markdown_help') }}" onClick="return popup(this, 'Markdown Help', 500, 500)">here</a>
-        for more info.
-    </p>
+        <p>
+            Standard Markdown syntax is supported for headings/text decoration/lists and more.
+            Click <a href="{{ url_for('markdown_help') }}" onClick="return popup(this, 'Markdown Help', 500, 500)">here</a>
+            for more info.
+        </p>
+        {% if template_files %}
+            <div class="form-inline">
+                <div class="form-group">
+                    <select id="templateSelect" class="form-control">
+                        <option value="">Select a comment template</option>
+                        {% for template_filename in template_files %}]
+                            <option value="{{ template_filename }}">{{ template_filename }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        {% endif %}
         <div class="media">
         <div class="media-left media-top">
             <a href="#">
@@ -85,11 +97,23 @@
         <div class="media-body">
             <form action="" method="post" id="commentForm">
                 <div class="form-group">
-                    <textarea class="form-control" rows="3" placeholder="Type your comment here" name="comment_text" form="commentForm"></textarea>
+                    <textarea class="form-control" rows="6" placeholder="Type your comment here" name="comment_text" form="commentForm" id="commentText"></textarea>
                 </div>
                 <button type="submit" class="btn">Post</button>
             </form>
         </div>
     </div>
     </div>
+{% endblock %}
+{% block script %}
+    <script type="text/javascript">
+        // Fetch a comment template and insert it into the comment body
+        $('#templateSelect').on('change', function () {
+            if (this.value != '') {
+                $.get('{{ url_for('get_comment_template', audition_id=audition.id, template_filename='') }}' + this.value, function( data ) {
+                  $('#commentText').val(data)
+                });
+            }
+        })
+    </script>
 {% endblock %}

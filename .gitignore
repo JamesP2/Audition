@@ -5,6 +5,7 @@ __pycache__/
 *$py.class
 
 config.py
-*.db
-
 *.log
+comment_template/
+
+*.db
