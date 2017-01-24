@@ -199,7 +199,7 @@ class Audition(db.Model):
     )
 
     __mapper_args__ = {
-        'order_by': start_time
+        'order_by': [audition_day_date, start_time]
     }
 
     def get_date_time_string(self):
