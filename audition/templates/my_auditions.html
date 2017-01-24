@@ -16,7 +16,11 @@
                 <tr>
                     <td>{{ audition.audition_day.show.name }}</td>
                     <td>{{ audition.get_date_time_string() }}</td>
-                    <td><a href="{{ url_for("manage_audition", audition_id=audition.id) }}">More Info</a> | <a href="{{ url_for("cancel_audition", audition_id=audition.id) }}" class="danger">Cancel Audition</a></td>
+                    <td><a href="{{ url_for("manage_audition", audition_id=audition.id) }}">More Info</a>
+                        {% if not audition.in_past() %}
+                            | <a href="{{ url_for("cancel_audition", audition_id=audition.id) }}" class="danger">Cancel Audition</a>
+                        {% endif %}
+                    </td>
                 </tr>
             {% endfor %}
             {% if user.auditions|length == 0 %}

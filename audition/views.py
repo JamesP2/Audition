@@ -407,6 +407,11 @@ def cancel_audition(audition_id):
         flash('You do not have permission to cancel that audition', 'danger')
         return redirect(url_for('index'))
 
+    if audition.auditionee == current_user and audition.in_past():
+        app.logger.warn('%s tried to cancel their own %s but it is in the past', current_user, audition)
+        flash('You cannot cancel your audition if it is in the past', 'danger')
+        return redirect(url_for('my_auditions'))
+
     if request.method == 'GET':
         return render_template('confirm_cancel.html',
                                show=audition.audition_day.show,
