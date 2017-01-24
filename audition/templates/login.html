@@ -16,7 +16,7 @@
     <div class="row">
         <div class="col-md-4"></div>
         <div class="col-md-4">
-            <a class="btn btn-block btn-social btn-facebook" href="{{ url_for('facebook_login', next='/') }}">
+            <a class="btn btn-block btn-social btn-facebook" href="{{ url_for('facebook_login', next=request.args.get('next') or '/')}}">
                 <span class="fa fa-facebook"></span> Sign in with Facebook
             </a>
         </div>
