@@ -22,6 +22,7 @@
                 <ul class="nav navbar-nav">
                     <li><a href="{{ url_for('shows') }}">Available Shows</a></li>
                     <li><a href="{{ url_for('my_auditions') }}">My Auditions</a></li>
+                    <li><a href="{{ url_for('profile') }}">My Profile</a></li>
                 </ul>
                 <p class="navbar-text navbar-right">
                     Signed in as <a href="{{ url_for('profile') }}" class="navbar-link">{{ g.user.first_name }} {{ g.user.last_name }}</a>.
