@@ -268,6 +268,11 @@ def manage_audition(audition_id):
 def edit_comment(audition_id, comment_id):
     comment = Comment.query.get(comment_id)
 
+    if current_user not in comment.audition.get_show().managers:
+        app.logger.warn('%s tried to edit %s but does not have permission', current_user, comment)
+        flash('You do not have permission to edit this comment', 'danger')
+        return redirect(url_for('index'))
+
     if comment.audition_id != audition_id:
         flash('Comment belongs to another audition', 'danger')
         return redirect(url_for('index'))
@@ -290,6 +295,28 @@ def edit_comment(audition_id, comment_id):
         return redirect(url_for('manage_audition', audition_id=audition_id))
 
     return render_template('edit_comment.html', comment=comment)
+
+
+@app.route('/comment/<int:comment_id>/delete')
+@login_required
+def delete_comment(comment_id):
+    comment = Comment.query.get(comment_id)
+
+    if comment is None:
+        flash('Comment not found', 'danger')
+        return redirect(url_for('index'))
+
+    if current_user not in comment.audition.get_show().managers:
+        app.logger.warn('%s tried to delete %s but does not have permission', current_user, comment)
+        flash('You do not have permission to delete this comment', 'danger')
+        return redirect(url_for('index'))
+
+    db.session.delete(comment)
+    db.session.commit()
+
+    app.logger.info('%s deleted comment %s', current_user, comment)
+
+    return redirect(url_for('manage_audition', audition_id=comment.audition_id))
 
 
 @app.route('/comment/<int:comment_id>/toggle_viewable')
