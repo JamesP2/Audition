@@ -3,7 +3,7 @@
 {% block body %}
     <h1>Your Audition for {{ show.name }}</h1>
     <p>
-        Your audition is on {{ audition.audition_day.get_date_string() }} at
+        Your audition {{ 'is' if not audition.in_past() else 'was' }} on {{ audition.audition_day.get_date_string() }} at
         {{ audition.get_start_time_string() }} until {{ audition.get_end_time_string() }}
     </p>
     {% if audition.has_feedback_for_auditionee() %}
