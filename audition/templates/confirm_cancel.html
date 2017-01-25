@@ -3,7 +3,11 @@
 {% block body %}
     <h1>Cancel Your Slot</h1>
     <p>You have chosen to <strong>cancel</strong> your audition for <strong>{{ show.name }}</strong> on the <strong>{{ audition.get_long_date_time_string() }}</strong>.</p>
-    <p>Once you do this you may not be able to re-book this slot again if someone takes it!</p>
+    {% if audition.in_past() %}
+        <p>If you went to this audition and you cancel it <strong>you may not receive any feedback</strong>. Only cancel this audition if you missed it and intend to book another!</p>
+    {% else %}
+        <p>Once you do this you may not be able to re-book this slot again if someone takes it!</p>
+    {% endif %}
     <form method="post" action="">
         <button type="submit" class="btn btn-danger">Cancel This Audition</button> <a href="{{ url_for('my_auditions') }}" class="btn btn-default">Go Back</a>
     </form>
