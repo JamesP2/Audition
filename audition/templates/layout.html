@@ -46,6 +46,16 @@
             {% endfor %}
         {% endif %}
     {% endwith %}
+        {% if g.warn_email %}
+            <div class="alert alert-warning alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                You do not have a valid email address configured for your profile. <br>
+                It is <strong>highly recommended</strong> that you have one on file so we can submit
+                audition feedback to you.<br>
+                <a href="{{ url_for('edit_profile', user_id=g.user.id) }}">Click here to edit your information</a>
+            </div>
+        {% endif %}
     {% block body %}{% endblock %}
     <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.1.1.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
