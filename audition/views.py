@@ -92,6 +92,8 @@ def facebook_authorized():
         app.logger.info('%s Logging in via Facebook', provider.user)
         login_user(provider.user)
 
+        destination = request.args.get('next') or url_for('index')
+
     else:
         first_name = me.data['first_name'].replace(' ', '_')
         last_name = me.data['last_name'].replace(' ', '_')
@@ -114,10 +116,13 @@ def facebook_authorized():
         app.logger.info('%s Logging in via Facebook (new user)', new_user)
         login_user(new_user)
 
+        flash('Since this is your first time logging in, please confirm your details are correct.', 'info')
+        destination = url_for('edit_profile', user_id=new_user.id)
+
     if 'WARN_EMAIL' in app.config and app.config['WARN_EMAIL'] and not validate_email(current_user.email):
         app.logger.info('%s has no valid email. They will be warned until it is changed.', current_user)
 
-    return redirect(request.args.get('next') or url_for('index'))
+    return redirect(destination)
 
 
 @facebook.tokengetter
