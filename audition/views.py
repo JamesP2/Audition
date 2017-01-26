@@ -465,6 +465,7 @@ def markdown_help():
 
 
 @app.route('/profile')
+@login_required
 def profile():
     return redirect(url_for('view_profile', user_id=current_user.id))
 
