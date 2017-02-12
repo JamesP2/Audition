@@ -157,8 +157,18 @@ def my_auditions():
 @app.route('/shows')
 @login_required
 def shows():
+    all_shows = Show.query.all()
+
+    all_shows_hidden = True
+
+    for current_show in all_shows:
+        if not current_show.hidden:
+            all_shows_hidden = False
+            break
+
     return render_template('shows.html',
-                           shows=Show.query.all())
+                           shows=all_shows,
+                           all_shows_hidden=all_shows_hidden)
 
 
 @app.route('/show/<int:show_id>')

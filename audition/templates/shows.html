@@ -28,7 +28,7 @@
                 </td>
             </tr>
         {% endfor %}
-        {% if shows|length == 0 %}
+        {% if shows|length == 0 or (all_shows_hidden and g.user.managed_shows|length == 0)%}
             <tr>
                 <td colspan="3" style="font-style: italic; text-align: center">Sorry, there are currently no shows open for audition.</td>
             </tr>
