@@ -138,6 +138,9 @@ def before_request():
             and current_user.is_authenticated and request.endpoint not in ['edit_profile', 'logout']:
         g.warn_email = not validate_email(current_user.email)
 
+    g.ganalytics_enable = app.config['GANALYTICS_ENABLE']
+    g.ganalytics_id = app.config['GANALYTICS_ID']
+
 
 @app.route('/')
 def index():
