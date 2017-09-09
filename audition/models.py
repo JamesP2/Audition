@@ -190,6 +190,8 @@ class Audition(db.Model):
     auditionee_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     auditionee = db.relationship('User', backref='auditions')
 
+    no_show = db.Column(db.Boolean(), default=False, nullable=False)
+
     __table_args__ = (
         db.ForeignKeyConstraint(
             ['audition_day_show_id', 'audition_day_date'],
