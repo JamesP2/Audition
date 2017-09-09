@@ -250,6 +250,7 @@ def create_show():
     print()
     name = input('Enter name for new show: ')
     show = Show(name=name)
+    show.hidden = True
 
     print('Adding show ' + show.name)
     db.session.add(show)
