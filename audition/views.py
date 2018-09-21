@@ -56,7 +56,6 @@ def facebook_login():
         return redirect(url_for('index'))
 
     callback_url = url_for('facebook_authorized',
-                           next=request.args.get('next') or request.referrer or None,
                            _external=True)
 
     return facebook.authorize(callback=callback_url)
@@ -541,7 +540,7 @@ def edit_profile(user_id):
         flash('Changes saved', 'success')
         return redirect(url_for('view_profile', user_id=user_id))
 
-    return
+    return render_template('edit_profile.html', user=user)
 
 
 @app.route('/privacy')
