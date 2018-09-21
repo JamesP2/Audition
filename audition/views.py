@@ -541,4 +541,11 @@ def edit_profile(user_id):
         flash('Changes saved', 'success')
         return redirect(url_for('view_profile', user_id=user_id))
 
-    return render_template('edit_profile.html', user=user)
+    return
+
+
+@app.route('/privacy')
+@login_required
+def privacy():
+    g.privacy_email = app.config['PRIVACY_EMAIL']
+    return render_template('privacy.html')

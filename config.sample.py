@@ -47,6 +47,9 @@ MAIL_BCC = None
 # Enable invalid email warnings for users?
 WARN_EMAIL = True
 
+# Email Address for Privacy Policy
+PRIVACY_EMAIL = 'me@example.com'
+
 # Google Analytics Enable
 GANALYTICS_ENABLE = False
 
