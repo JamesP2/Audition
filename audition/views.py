@@ -545,7 +545,6 @@ def edit_profile(user_id):
 
 
 @app.route('/privacy')
-@login_required
 def privacy():
     g.privacy_email = app.config['PRIVACY_EMAIL']
     return render_template('privacy.html')
